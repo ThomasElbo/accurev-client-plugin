@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AcResponse
+        Command="show depots"
+        TaskId="1260">
+    <Element
+            Number="1"
+            Name="accurev"
+            Slice="1"
+            exclusiveLocking="false"
+            case="insensitive"
+            locWidth="128"/>
+    <Element
+            Number="2"
+            Name="second accurev"
+            Slice="2"
+            exclusiveLocking="false"
+            case="insensitive"
+            locWidth="128"/>
+</AcResponse>

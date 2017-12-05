@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<streams>
+    <stream
+            name="accurev"
+            depotName="accurev"
+            streamNumber="1"
+            isDynamic="true"
+            type="normal"
+            startTime="1512169249"
+            hasProperties="false"/>
+    <stream
+            name="accurev_josp"
+            basis="accurev"
+            basisStreamNumber="1"
+            depotName="accurev"
+            streamNumber="2"
+            isDynamic="false"
+            type="workspace"
+            startTime="1512169250"
+            hasProperties="false"/>
+    <stream
+            name="second accurev"
+            depotName="second accurev"
+            streamNumber="1"
+            isDynamic="true"
+            type="normal"
+            startTime="1512479158"
+            hasProperties="false"/>
+    <stream
+            name="second accurev_josp"
+            basis="second accurev"
+            basisStreamNumber="1"
+            depotName="second accurev"
+            streamNumber="2"
+            isDynamic="false"
+            type="workspace"
+            startTime="1512479177"
+            hasProperties="false"/>
+</streams>
