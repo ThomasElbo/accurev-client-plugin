@@ -14,6 +14,7 @@ plugins {
     id("org.jenkins-ci.jpi") version "0.24.0"
     id("org.jetbrains.dokka") version "0.9.15"
     id("com.diffplug.gradle.spotless") version "3.7.0"
+    jacoco
 }
 
 dependencies {
@@ -68,8 +69,18 @@ spotless {
     }
 }
 
+jacoco {
+    toolVersion = "0.7.9"
+}
+
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks.withType<JacocoReport> {
+    reports {
+        xml.isEnabled = true
+    }
 }
 
 tasks.withType<KotlinCompile> {
