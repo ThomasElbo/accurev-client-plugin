@@ -8,17 +8,13 @@ import javax.xml.bind.annotation.XmlRootElement
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "AcResponse")
-data class AccurevDepots(
-    @field:XmlAttribute(name = "Command")
-    val command: String = "",
-    @field:XmlAttribute(name = "TaskId")
-    val taskId: String = "",
+data class Depots(
     @field:XmlElement(name = "Element")
-    val elements: MutableList<AccurevDepot> = mutableListOf()
+    val elements: MutableList<Depot> = mutableListOf()
 )
 
 @XmlAccessorType(XmlAccessType.FIELD)
-data class AccurevDepot(
+data class Depot(
     @field:XmlAttribute(name = "Number")
     val number: String = "",
     @field:XmlAttribute(name = "Name")
