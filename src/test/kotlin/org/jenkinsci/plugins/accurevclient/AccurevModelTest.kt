@@ -8,7 +8,7 @@ import ch.tutteli.atrium.api.cc.en_UK.isTrue
 import ch.tutteli.atrium.api.cc.en_UK.it
 import ch.tutteli.atrium.api.cc.en_UK.property
 import ch.tutteli.atrium.api.cc.en_UK.toBe
-import ch.tutteli.atrium.verbs.assert.assert
+import ch.tutteli.atrium.verbs.expect.expect
 import org.jenkinsci.plugins.accurevclient.model.Depots
 import org.jenkinsci.plugins.accurevclient.model.StreamType
 import org.jenkinsci.plugins.accurevclient.model.Streams
@@ -23,10 +23,10 @@ class AccurevModelTest {
         xml.use { input ->
             val depots = input.unmarshal() as Depots
             println(depots)
-            assert(depots) {
+            expect(depots) {
                 property(it::elements).hasSize(2)
             }
-            assert(depots.elements[0]) {
+            expect(depots.elements[0]) {
                 property(it::number).toBe("1")
                 property(it::name).toBe("accurev")
             }
@@ -40,10 +40,10 @@ class AccurevModelTest {
         xml.use { input ->
             val output = input.unmarshal() as Streams
             println(output)
-            assert(output) {
+            expect(output) {
                 property(it::streams).hasSize(4)
             }
-            assert(output.streams[0]) {
+            expect(output.streams[0]) {
                 property(it::name).toBe("accurev")
                 property(it::depotName).toBe("accurev")
                 property(it::streamNumber).toBe(1)
@@ -52,7 +52,7 @@ class AccurevModelTest {
                 property(it::startTime).toBe(timestampAdapter.unmarshal(1512169249))
                 property(it::type).toBe(StreamType.NORMAL)
             }
-            assert(output.streams[1]) {
+            expect(output.streams[1]) {
                 property(it::name).toBe("accurev_josp")
                 property(it::depotName).toBe("accurev")
                 property(it::streamNumber).toBe(2)
