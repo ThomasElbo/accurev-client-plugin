@@ -5,7 +5,15 @@ import java.util.Date
 import javax.xml.bind.annotation.adapters.XmlAdapter
 
 class TimestampAdapter : XmlAdapter<Long, Date>() {
-    override fun marshal(date: Date?): Long = date?.toInstant()?.epochSecond ?: Instant.now().epochSecond
+    override fun marshal(date: Date?): Long {
+        if (date == null) return Instant.now().epochSecond
+        val instant = date.toInstant()
+        if (instant == null) return Instant.now().epochSecond
+        return instant.epochSecond
+    }
 
-    override fun unmarshal(timestamp: Long?): Date = timestamp?.let { Date.from(Instant.ofEpochSecond(it)) } ?: Date()
+    override fun unmarshal(timestamp: Long?): Date {
+        if (timestamp == null) return Date()
+        return Date.from(Instant.ofEpochSecond(timestamp))
+    }
 }
