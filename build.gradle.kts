@@ -23,6 +23,7 @@ dependencies {
     testCompile("junit:junit:4.12")
     testCompile("ch.tutteli:atrium-cc-en_UK-robstoll:$atriumVersion")
     testCompile("ch.tutteli:atrium-verbs:$atriumVersion")
+    testCompile("com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0-alpha02")
 
     jenkinsPlugins("org.jenkins-ci.plugins:credentials:$jenkinsCredentialsPluginVersion")
 
