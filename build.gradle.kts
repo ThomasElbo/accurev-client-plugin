@@ -9,8 +9,8 @@ val sezpozVersion by project
 val atriumVersion by project
 
 plugins {
-    kotlin("jvm") version "1.2.0"
-    kotlin("kapt") version "1.2.0"
+    kotlin("jvm") version "1.2.10"
+    kotlin("kapt") version "1.2.10"
     id("org.jenkins-ci.jpi") version "0.24.0"
     id("org.jetbrains.dokka") version "0.9.15"
     id("com.diffplug.gradle.spotless") version "3.7.0"
