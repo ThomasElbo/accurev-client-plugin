@@ -9,3 +9,9 @@ class TimestampAdapter : XmlAdapter<Long, Date>() {
 
     override fun unmarshal(timestamp: Long?): Date = timestamp?.let { Date.from(Instant.ofEpochSecond(it)) } ?: Date()
 }
+
+class AccurevPathAdapter : XmlAdapter<String, String>() {
+    override fun marshal(path: String): String = "/./$path"
+
+    override fun unmarshal(path: String): String = path.toAccurevPath()
+}
