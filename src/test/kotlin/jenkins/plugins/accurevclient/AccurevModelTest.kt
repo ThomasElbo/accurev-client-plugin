@@ -17,7 +17,7 @@ import jenkins.plugins.accurevclient.utils.unmarshal
 import org.junit.Test
 
 class AccurevModelTest {
-    @Test fun DepotModel() {
+    @Test fun depotModel() {
         val xml = this.javaClass.getResourceAsStream("depots.xml")
 
         xml.use { input ->
@@ -33,7 +33,7 @@ class AccurevModelTest {
         }
     }
 
-    @Test fun StreamModel() {
+    @Test fun streamModel() {
         val xml = this.javaClass.getResourceAsStream("streams.xml")
         val timestampAdapter = TimestampAdapter()
 

@@ -35,6 +35,18 @@ fun Secret.isNotEmpty(): Boolean = Secret.toString(this).isNotEmpty()
 val ByteArrayOutputStream.defaultCharset: String
     get() = toString(Charset.defaultCharset().name())
 
+/**
+ * Returns sanitized Accurev Path as [String]
+ * Replaces Windows backslash and removes Accurev's prefixed "/./"
+ */
+fun String.toAccurevPath(): String = replace("\\", "/").removePrefix("/./")
+
+/**
+ * Extend [InputStream] with [JAXB.unmarshal]
+ */
 inline fun <reified T> InputStream.unmarshal(): T = JAXB.unmarshal(this, T::class.java)
 
+/**
+ * Extend [Reader] with [JAXB.unmarshal]
+ */
 inline fun <reified T> Reader.unmarshal(): T = JAXB.unmarshal(this, T::class.java)
