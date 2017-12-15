@@ -7,6 +7,7 @@ import hudson.Launcher.LocalLauncher
 import hudson.model.TaskListener
 import hudson.util.ArgumentListBuilder
 import hudson.util.Secret
+import jenkins.plugins.accurevclient.commands.HistCommand
 import jenkins.plugins.accurevclient.commands.LoginCommand
 import jenkins.plugins.accurevclient.utils.defaultCharset
 import jenkins.plugins.accurevclient.utils.isNotEmpty
@@ -36,6 +37,31 @@ class AccurevCliAPI (
         if (xml) add("-fx")
     }
 
+    override fun hist(): HistCommand {
+        return object : HistCommand {
+            private val args = accurev("hist", true)
+
+            override fun depot(depot: String): HistCommand {
+                args.add("-p", depot)
+                return this
+            }
+
+            override fun stream(stream: String): HistCommand {
+                args.add("-s", stream)
+                return this
+            }
+
+            override fun timeSpec(timeSpec: String): HistCommand {
+                args.add("-t", timeSpec)
+                return this
+            }
+
+            override fun execute() {
+                launchCommand(args)
+            }
+        }
+    }
+
     override fun login(): LoginCommand {
         return object : LoginCommand {
             private val args = accurev("login")
@@ -62,7 +88,7 @@ class AccurevCliAPI (
     }
 
     @JvmOverloads
-    @Throws(AccurevException::class)
+    @Throws(AccurevException::class, InterruptedException::class)
     fun launchCommand(
         args: ArgumentListBuilder,
         ws: FilePath = workspace,
@@ -96,7 +122,7 @@ class AccurevCliAPI (
             }
             return result
         } catch (e: InterruptedException) {
-            throw AccurevException("Oh no, accurev was interrupted trying to execute $command", e)
+            throw e
         } catch (e: IOException) {
             throw AccurevException("IO failed while trying to execute $command", e)
         } catch (e: UnsupportedEncodingException) {
