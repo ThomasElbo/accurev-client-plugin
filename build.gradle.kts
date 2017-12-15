@@ -78,15 +78,16 @@ java {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
-tasks.withType<JacocoReport> {
-    reports {
-        xml.isEnabled = true
+tasks {
+    withType<JacocoReport> {
+        reports {
+            xml.isEnabled
+        }
     }
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "1.8"
+    withType<KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
     }
 }
 
