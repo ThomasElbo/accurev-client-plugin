@@ -9,6 +9,8 @@ import hudson.util.ArgumentListBuilder
 import hudson.util.Secret
 import jenkins.plugins.accurevclient.commands.HistCommand
 import jenkins.plugins.accurevclient.commands.LoginCommand
+import jenkins.plugins.accurevclient.commands.PopulateCommand
+import jenkins.plugins.accurevclient.commands.UpdateCommand
 import jenkins.plugins.accurevclient.utils.defaultCharset
 import jenkins.plugins.accurevclient.utils.isNotEmpty
 import jenkins.plugins.accurevclient.utils.rootPath
@@ -56,8 +58,76 @@ class AccurevCliAPI (
                 return this
             }
 
+            @Throws(AccurevException::class, InterruptedException::class)
             override fun execute() {
                 launchCommand(args)
+            }
+        }
+    }
+
+    override fun populate(): PopulateCommand {
+        return object : PopulateCommand {
+            val args = accurev("pop").add("-L", workspace.remote)
+
+            override fun stream(stream: String): PopulateCommand {
+                args.add("-v", stream)
+                return this
+            }
+
+            override fun overwrite(overwrite: Boolean): PopulateCommand {
+                args.add("-O")
+                return this
+            }
+
+            override fun timespec(timespec: String): PopulateCommand {
+                args.add("-t", timespec)
+                return this
+            }
+
+            override fun elements(set: Set<String>): PopulateCommand {
+                args.add("-R", if (set.isEmpty()) "." else set.joinToString(","))
+                return this
+            }
+            override fun listFile(listFile: FilePath): PopulateCommand {
+                args.add("-l", listFile.remote)
+                return this
+            }
+
+            @Throws(AccurevException::class, InterruptedException::class)
+            override fun execute() {
+                launchCommand(args)
+            }
+        }
+    }
+
+    override fun update(): UpdateCommand {
+        return object : UpdateCommand {
+            val args = accurev("update", true)
+            lateinit var output: MutableList<String>
+            override fun referenceTree(referenceTree: String): UpdateCommand {
+                args.add("-r", referenceTree)
+                return this
+            }
+
+            override fun stream(stream: String): UpdateCommand {
+                args.add("-s", stream)
+                return this
+            }
+
+            override fun range(latestTransaction: Long, previousTransaction: Long): UpdateCommand {
+                args.add("-t", "$latestTransaction-$previousTransaction")
+                return this
+            }
+
+            override fun preview(output: MutableList<String>): UpdateCommand {
+                args.add("-i")
+                this.output = output
+                return this
+            }
+
+            @Throws(AccurevException::class, InterruptedException::class)
+            override fun execute() {
+                val result = launchCommand(args)
             }
         }
     }
@@ -81,6 +151,7 @@ class AccurevCliAPI (
                 return this
             }
 
+            @Throws(AccurevException::class, InterruptedException::class)
             override fun execute() {
                 launchCommand(args)
             }

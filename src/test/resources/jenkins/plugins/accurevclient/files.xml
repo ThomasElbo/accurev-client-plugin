@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AcResponse
+        Command="stat"
+        Directory="C:/Users/josep/accurev/ws/accurev"
+        TaskId="1092">
+    <element
+            location=".\doubleDAMN"
+            dir="no"
+            executable="no"
+            id="5"
+            elemType="text"
+            size="0"
+            modTime="1512930582"
+            hierType="parallel"
+            Virtual="2\2"
+            namedVersion="accurev_josp\2"
+            Real="2\2"
+            status="(defunct)(kept)(member)"/>
+    <element
+            location=".\bud"
+            dir="no"
+            executable="no"
+            id="3"
+            elemType="text"
+            size="5"
+            modTime="1512907631"
+            hierType="parallel"
+            Virtual="3\3"
+            namedVersion="other_stream\3"
+            Real="2\3"
+            status="(backed)"/>
+    <element
+            location=".\Jenkinsfile"
+            dir="no"
+            executable="no"
+            id="2"
+            elemType="text"
+            size="120"
+            modTime="1512169390"
+            hierType="parallel"
+            Virtual="1\1"
+            namedVersion="accurev\1"
+            Real="2\2"
+            status="(backed)"/>
+</AcResponse>

@@ -2,6 +2,8 @@ import org.jenkinsci.gradle.plugins.jpi.JpiDeveloper
 import org.jenkinsci.gradle.plugins.jpi.JpiLicense
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+val jvmVersion by project
+val jacocoVersion by project
 val ktlintVersion by project
 val jenkinsCoreVersion by project
 val jenkinsCredentialsPluginVersion by project
@@ -39,7 +41,6 @@ jenkinsPlugin {
     url = "https://wiki.jenkins.io/display/JENKINS/Accurev+Client+Plugin"
 
     coreVersion = jenkinsCoreVersion as String
-    compatibleSinceVersion = coreVersion
     fileExtension = "jpi"
     pluginFirstClassLoader = true
     workDir = file("$buildDir/work")
@@ -71,7 +72,7 @@ spotless {
 }
 
 jacoco {
-    toolVersion = "0.7.9"
+    toolVersion = jacocoVersion as String
 }
 
 java {
@@ -86,7 +87,7 @@ tasks {
     }
     withType<KotlinCompile> {
         kotlinOptions {
-            jvmTarget = "1.8"
+            jvmTarget = jvmVersion as String
         }
     }
 }

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<acResponse
+        command="update"
+        TaskId="1131">
+    <progress
+            phase="Preparing for update"
+            increment="100"/>
+    <progress
+            phase="Calculating changes"
+            increment="100"
+            number="4"/>
+    <progress
+            phase="results"
+            number="3"/>
+    <message>Would replace content of &quot;doubleDAMN&quot; .
+    </message>
+    <Change
+            What="version"
+            step="1">
+        <Stream1
+                Name="doubleDAMN"
+                eid="5"
+                Version="2/1"
+                NamedVersion="accurev_josp/1"
+                IsDir="no"
+                elemType="text"/>
+        <Stream2
+                Name="doubleDAMN"
+                eid="5"
+                Version="2/1"
+                NamedVersion="accurev_josp/1"
+                VirtualVersion="2/1"
+                IsDir="no"
+                elemType="text"/>
+    </Change>
+    <element
+            location="doubleDAMN"/>
+    <message>Would replace content of &quot;bud&quot; .
+    </message>
+    <Change
+            What="version"
+            step="2">
+        <Stream1
+                Name="bud"
+                eid="3"
+                Version="2/3"
+                NamedVersion="accurev_josp/3"
+                IsDir="no"
+                elemType="text"/>
+        <Stream2
+                Name="bud"
+                eid="3"
+                Version="2/3"
+                NamedVersion="accurev_josp/3"
+                VirtualVersion="2/3"
+                IsDir="no"
+                elemType="text"/>
+    </Change>
+    <element
+            location="bud"/>
+    <message>Would replace content of &quot;Jenkinsfile&quot; .
+    </message>
+    <Change
+            What="version"
+            step="3">
+        <Stream1
+                Name="Jenkinsfile"
+                eid="2"
+                Version="2/2"
+                NamedVersion="accurev_josp/2"
+                IsDir="no"
+                elemType="text"/>
+        <Stream2
+                Name="Jenkinsfile"
+                eid="2"
+                Version="2/2"
+                NamedVersion="accurev_josp/2"
+                VirtualVersion="2/2"
+                IsDir="no"
+                elemType="text"/>
+    </Change>
+    <element
+            location="Jenkinsfile"/>
+</acResponse>
