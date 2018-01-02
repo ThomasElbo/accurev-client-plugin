@@ -11,15 +11,23 @@ import jenkins.plugins.accurevclient.commands.HistCommand
 import jenkins.plugins.accurevclient.commands.LoginCommand
 import jenkins.plugins.accurevclient.commands.PopulateCommand
 import jenkins.plugins.accurevclient.commands.UpdateCommand
+import jenkins.plugins.accurevclient.model.AccurevDepots
+import jenkins.plugins.accurevclient.model.AccurevInfo
+import jenkins.plugins.accurevclient.model.AccurevReferenceTrees
+import jenkins.plugins.accurevclient.model.AccurevStream
+import jenkins.plugins.accurevclient.model.AccurevStreams
+import jenkins.plugins.accurevclient.model.AccurevUpdate
+import jenkins.plugins.accurevclient.model.AccurevWorkspaces
 import jenkins.plugins.accurevclient.utils.defaultCharset
 import jenkins.plugins.accurevclient.utils.isNotEmpty
 import jenkins.plugins.accurevclient.utils.rootPath
+import jenkins.plugins.accurevclient.utils.unmarshal
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.util.concurrent.TimeUnit
 
-class AccurevCliAPI (
+class AccurevCliAPI(
     private val workspace: FilePath,
     private val environment: EnvVars,
     val accurevExe: String,
@@ -88,6 +96,7 @@ class AccurevCliAPI (
                 args.add("-R", if (set.isEmpty()) "." else set.joinToString(","))
                 return this
             }
+
             override fun listFile(listFile: FilePath): PopulateCommand {
                 args.add("-l", listFile.remote)
                 return this
@@ -103,7 +112,7 @@ class AccurevCliAPI (
     override fun update(): UpdateCommand {
         return object : UpdateCommand {
             val args = accurev("update", true)
-            lateinit var output: MutableList<String>
+
             override fun referenceTree(referenceTree: String): UpdateCommand {
                 args.add("-r", referenceTree)
                 return this
@@ -119,17 +128,86 @@ class AccurevCliAPI (
                 return this
             }
 
-            override fun preview(output: MutableList<String>): UpdateCommand {
-                args.add("-i")
-                this.output = output
-                return this
-            }
-
             @Throws(AccurevException::class, InterruptedException::class)
             override fun execute() {
-                val result = launchCommand(args)
+                launchCommand(args)
             }
         }
+    }
+
+    override fun getWorkspaces(): AccurevWorkspaces {
+        with(accurev("show", true)) {
+            add("wspaces")
+            return launch().unmarshal() as AccurevWorkspaces
+        }
+    }
+
+    override fun getReferenceTrees(): AccurevReferenceTrees {
+        with(accurev("show", true)) {
+            add("refs")
+            return launch().unmarshal() as AccurevReferenceTrees
+        }
+    }
+
+    override fun getDepots(): AccurevDepots {
+        with(accurev("show", true)) {
+            add("depots")
+            return launch().unmarshal() as AccurevDepots
+        }
+    }
+
+    @Throws(AccurevException::class)
+    override fun getStream(stream: String): AccurevStream {
+        with(accurev("show", true)) {
+            add("-s", stream, "streams")
+            val accurevStreams = launch().unmarshal() as AccurevStreams
+            if (accurevStreams.streams.size != 1) throw AccurevException("Stream not found")
+            return accurevStreams.streams[0]
+        }
+    }
+
+    override fun getStreams(depot: String): AccurevStreams {
+        with(accurev("show", true)) {
+            if (depot.isNotBlank()) add("-p", depot)
+            add("streams")
+            return launch().unmarshal() as AccurevStreams
+        }
+    }
+
+    override fun getChildStreams(stream: String): AccurevStreams {
+        with(accurev("show", true)) {
+            add("-R", "-s", stream, "streams")
+            return launch().unmarshal() as AccurevStreams
+        }
+    }
+
+    override fun getUpdatedElements(
+        stream: String,
+        latestTransaction: Long,
+        previousTransaction: Long,
+        referenceTree: Boolean
+    ): AccurevUpdate {
+        with(accurev("update", true)) {
+            add(if (referenceTree) "-r" else "-s", stream)
+            add("-t", "$latestTransaction-$previousTransaction", "-i")
+            return launch().unmarshal() as AccurevUpdate
+        }
+    }
+
+    override fun syncTime() {
+        accurev("synctime").launch()
+    }
+
+    override fun getInfo(): AccurevInfo {
+        with(accurev("info", true)) {
+            add("-v")
+            return launch().unmarshal() as AccurevInfo
+        }
+    }
+
+    override fun getVersion(): String {
+        val result = ArgumentListBuilder(accurevExe).launch()
+        return result.split(' ')[1]
     }
 
     override fun login(): LoginCommand {
@@ -144,7 +222,7 @@ class AccurevCliAPI (
             override infix fun password(password: Secret): LoginCommand {
                 when {
                     password.isNotEmpty() -> args.addMasked(password)
-                    // Workaround for https://issues.jenkins-ci.org/browse/JENKINS-39066
+                // Workaround for https://issues.jenkins-ci.org/browse/JENKINS-39066
                     launcher.isUnix -> args.add("", true)
                     else -> args.addQuoted("", true)
                 }
@@ -204,4 +282,6 @@ class AccurevCliAPI (
     companion object {
         val TIMEOUT: Int = Integer.getInteger("${AccurevClient::class.java.name}.timeOut", 10)
     }
+
+    private fun ArgumentListBuilder.launch(): String = this@AccurevCliAPI.launchCommand(this)
 }

@@ -8,12 +8,12 @@ import javax.xml.bind.annotation.XmlRootElement
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "acResponse")
-data class Update(
+data class AccurevUpdate(
     @field:XmlElement(name = "element")
-    val elements: MutableList<Location> = mutableListOf()
+    val elements: MutableList<AccurevLocation> = mutableListOf()
 )
 
-data class Location(
+data class AccurevLocation(
     @field:XmlAttribute(name = "location")
     val path: String = ""
 )

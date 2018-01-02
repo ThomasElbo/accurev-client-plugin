@@ -9,6 +9,4 @@ interface UpdateCommand : AccurevCommand {
     fun stream(stream: String): UpdateCommand
 
     fun range(latestTransaction: Long, previousTransaction: Long): UpdateCommand
-
-    fun preview(output: MutableList<String>): UpdateCommand
 }

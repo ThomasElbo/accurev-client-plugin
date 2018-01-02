@@ -50,3 +50,8 @@ inline fun <reified T> InputStream.unmarshal(): T = JAXB.unmarshal(this, T::clas
  * Extend [Reader] with [JAXB.unmarshal]
  */
 inline fun <reified T> Reader.unmarshal(): T = JAXB.unmarshal(this, T::class.java)
+
+/**
+ * Extend [String] with [JAXB.unmarshal], casting [String] to [Reader]
+ */
+inline fun <reified T> String.unmarshal(): T = JAXB.unmarshal(this.reader(), T::class.java)

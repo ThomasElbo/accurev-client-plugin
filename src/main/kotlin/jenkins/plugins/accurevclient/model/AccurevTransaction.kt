@@ -15,13 +15,13 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "AcResponse")
-data class Transactions(
+data class AccurevTransactions(
     @field:XmlElement(name = "transaction")
-    val transactions: MutableList<Transaction> = mutableListOf()
+    val transactions: MutableList<AccurevTransaction> = mutableListOf()
 )
 
 @XmlAccessorType(XmlAccessType.FIELD)
-data class Transaction(
+data class AccurevTransaction(
     @field:XmlAttribute(required = true)
     val id: Long = 0,
     @field:XmlAttribute
@@ -34,13 +34,13 @@ data class Transaction(
     @field:XmlElement
     val comment: String = "",
     @field:XmlElement
-    val version: Version? = null,
+    val version: AccurevTransactionVersion? = null,
     @field:XmlElement
-    val stream: Stream? = null
+    val stream: AccurevStream? = null
 )
 
 @XmlAccessorType(XmlAccessType.FIELD)
-data class Version(
+data class AccurevTransactionVersion(
     @field:XmlAttribute(required = true)
     @field:XmlJavaTypeAdapter(AccurevPathAdapter::class)
     val path: String = "",

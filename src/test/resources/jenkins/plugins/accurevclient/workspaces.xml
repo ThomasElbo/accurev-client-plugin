@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AcResponse
+        Command="show wspaces"
+        TaskId="1273">
+    <Element
+            Name="accurev_josp"
+            Storage="/home/joseph/ws/accurev_josp"
+            Host="joseph-laptop"
+            Stream="2"
+            depot="accurev"
+            Target_trans="28"
+            Trans="28"
+            fileModTime="1514211417"
+            Type="1"
+            EOL="0"
+            user_id="1"
+            user_name="josp"/>
+    <Element
+            Name="second accurev_josp"
+            Storage="C:/Users/josep/second accurev"
+            Host="rocky"
+            Stream="2"
+            depot="second accurev"
+            Target_trans="2"
+            Trans="2"
+            fileModTime="1512479175"
+            Type="1"
+            EOL="0"
+            user_id="1"
+            user_name="josp"/>
+</AcResponse>

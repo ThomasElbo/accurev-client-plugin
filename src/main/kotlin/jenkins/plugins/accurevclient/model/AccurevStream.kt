@@ -14,33 +14,36 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "streams")
-data class Streams(
+data class AccurevStreams(
     @field:XmlElement(name = "stream")
-    val streams: MutableList<Stream> = mutableListOf()
+    val streams: MutableList<AccurevStream> = mutableListOf()
 )
 
 @XmlAccessorType(XmlAccessType.FIELD)
-data class Stream(
+data class AccurevStream(
     @field:XmlAttribute(required = true)
     val name: String = "",
     @field:XmlAttribute
     val depotName: String = "",
     @field:XmlAttribute(required = true)
-    val streamNumber: Int = 0,
+    val streamNumber: Long = 0,
     @field:XmlAttribute
-    val basisStreamNumber: Int? = null,
+    val basisStreamNumber: Long? = null,
     @field:XmlAttribute(name = "isDynamic")
     val dynamic: Boolean = false,
     @field:XmlAttribute
-    val type: StreamType = StreamType.Normal,
+    val type: AccurevStreamType = AccurevStreamType.Normal,
     @field:XmlJavaTypeAdapter(TimestampAdapter::class)
     @field:XmlAttribute
-    val startTime: Date = Date(0)
+    val startTime: Date = Date(0),
+    @field:XmlJavaTypeAdapter(TimestampAdapter::class)
+    @field:XmlAttribute
+    val time: Date? = null
 )
 
 @XmlType
 @XmlEnum
-enum class StreamType(val type: String) {
+enum class AccurevStreamType(val type: String) {
     @XmlEnumValue("normal")
     Normal("normal"),
     @XmlEnumValue("snapshot")

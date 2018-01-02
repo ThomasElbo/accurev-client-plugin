@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<workspaceInfo
+        shell="/bin/bash"
+        principal="(not logged in)"
+        host="joseph-laptop"
+        domain="(none)"
+        serverName="accurevbox.josephp.tech"
+        serverPort="5050"
+        databaseEncoding="Unicode"
+        accurevBin="/home/joseph/AccuRevClient/bin"
+        clientTime="2017/12/25 20:27:44 CET (1514230064)"
+        serverTime="2017/12/25 20:27:44 CET (1514230064)"/>

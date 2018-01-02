@@ -9,14 +9,16 @@ import ch.tutteli.atrium.api.cc.en_UK.it
 import ch.tutteli.atrium.api.cc.en_UK.property
 import ch.tutteli.atrium.api.cc.en_UK.toBe
 import ch.tutteli.atrium.verbs.expect.expect
-import jenkins.plugins.accurevclient.model.Depots
-import jenkins.plugins.accurevclient.model.Stream
-import jenkins.plugins.accurevclient.model.StreamType
-import jenkins.plugins.accurevclient.model.Streams
+import jenkins.plugins.accurevclient.model.AccurevDepots
+import jenkins.plugins.accurevclient.model.AccurevInfo
+import jenkins.plugins.accurevclient.model.AccurevStream
+import jenkins.plugins.accurevclient.model.AccurevStreamType
+import jenkins.plugins.accurevclient.model.AccurevStreams
+import jenkins.plugins.accurevclient.model.AccurevTransactionVersion
+import jenkins.plugins.accurevclient.model.AccurevTransactions
+import jenkins.plugins.accurevclient.model.AccurevUpdate
+import jenkins.plugins.accurevclient.model.AccurevWorkspaces
 import jenkins.plugins.accurevclient.model.TransactionType
-import jenkins.plugins.accurevclient.model.Transactions
-import jenkins.plugins.accurevclient.model.Update
-import jenkins.plugins.accurevclient.model.Version
 import jenkins.plugins.accurevclient.utils.TimestampAdapter
 import jenkins.plugins.accurevclient.utils.unmarshal
 import org.junit.Test
@@ -26,29 +28,29 @@ class AccurevModelTest {
     private val timestampAdapter = TimestampAdapter()
 
     @Test fun depotModel() {
-        val xml = this.javaClass.getResourceAsStream("depots.xml")
+        val input = this.javaClass.getResourceAsStream("depots.xml")
 
-        xml.use { input ->
-            val depots = input.unmarshal() as Depots
+        input.use { xml ->
+            val depots = xml.unmarshal() as AccurevDepots
             println(depots)
             expect(depots) {
                 property(it::elements).hasSize(2)
             }
             expect(depots.elements[0]) {
-                property(it::number).toBe("1")
+                property(it::number).toBe(1)
                 property(it::name).toBe("accurev")
             }
         }
     }
 
     @Test fun streamModel() {
-        val xml = this.javaClass.getResourceAsStream("streams.xml")
+        val input = this.javaClass.getResourceAsStream("streams.xml")
 
-        xml.use { input ->
-            val output = input.unmarshal() as Streams
+        input.use { xml ->
+            val output = xml.unmarshal() as AccurevStreams
             println(output)
             expect(output) {
-                property(it::streams).hasSize(4)
+                property(it::streams).hasSize(10)
             }
             expect(output.streams[0]) {
                 property(it::name).toBe("accurev")
@@ -57,7 +59,7 @@ class AccurevModelTest {
                 property(it::basisStreamNumber).isNull()
                 property(it::dynamic).isTrue()
                 property(it::startTime).toBe(timestampAdapter.unmarshal(1512169249))
-                property(it::type).toBe(StreamType.Normal)
+                property(it::type).toBe(AccurevStreamType.Normal)
             }
             expect(output.streams[1]) {
                 property(it::name).toBe("accurev_josp")
@@ -66,16 +68,25 @@ class AccurevModelTest {
                 property(it::basisStreamNumber).isNotNull { toBe(1) }
                 property(it::dynamic).isFalse()
                 property(it::startTime).toBe(timestampAdapter.unmarshal(1512169250))
-                property(it::type).toBe(StreamType.Workspace)
+                property(it::type).toBe(AccurevStreamType.Workspace)
             }
         }
     }
 
-    @Test fun transactionModel() {
-        val xml = this.javaClass.getResourceAsStream("hist.xml")
+    @Test fun emptyStreamsModel() {
+        val input = "<streams></streams>"
+        val output = input.unmarshal() as AccurevStreams
+        println(output)
+        expect(output) {
+            property(it::streams).hasSize(0)
+        }
+    }
 
-        xml.use { input ->
-            val output = input.unmarshal() as Transactions
+    @Test fun transactionModel() {
+        val input = this.javaClass.getResourceAsStream("hist.xml")
+
+        input.use { xml ->
+            val output = xml.unmarshal() as AccurevTransactions
             println(output)
             expect(output.transactions[0]) {
                 property(it::comment).toBe("c")
@@ -83,7 +94,7 @@ class AccurevModelTest {
                 property(it::type).toBe(TransactionType.Promote)
                 property(it::user).toBe("josp")
                 property(it::time).toBe(timestampAdapter.unmarshal(1512907647))
-                property(it::version).isNotNull { toBe(Version("bud", 3)) }
+                property(it::version).isNotNull { toBe(AccurevTransactionVersion("bud", 3)) }
                 property(it::stream).isNull()
             }
             expect(output.transactions[3]) {
@@ -93,19 +104,68 @@ class AccurevModelTest {
                 property(it::user).toBe("josp")
                 property(it::time).toBe(timestampAdapter.unmarshal(1512907076))
                 property(it::version).isNull()
-                property(it::stream).isNotNull { toBe(Stream("other_stream", "accurev", 3, 1, false, StreamType.Normal, Date(0))) }
+                property(it::stream).isNotNull { toBe(AccurevStream(
+                    "other_stream",
+                    "accurev",
+                    3,
+                    1,
+                    false,
+                    AccurevStreamType.Normal,
+                    Date(0),
+                    Date(0)
+                )) }
             }
         }
     }
 
     @Test fun updateModel() {
-        val xml = this.javaClass.getResourceAsStream("update.xml")
+        val input = this.javaClass.getResourceAsStream("update.xml")
 
-        xml.use { input ->
-            val output = input.unmarshal() as Update
+        input.use { xml ->
+            val output = xml.unmarshal() as AccurevUpdate
             println(output)
             expect(output.elements[0]) {
                 property(it::path).toBe("doubleDAMN")
+            }
+        }
+    }
+
+    @Test fun workspaceModel() {
+        val input = this.javaClass.getResourceAsStream("workspaces.xml")
+
+        input.use { xml ->
+            val output = xml.unmarshal() as AccurevWorkspaces
+            println(output)
+            expect(output.elements[0]) {
+                property(it::name).toBe("accurev_josp")
+            }
+        }
+    }
+
+    @Test fun infoModelWithWorkspace() {
+        val input = this.javaClass.getResourceAsStream("inworkspace-info.xml")
+
+        input.use { xml ->
+            val output = xml.unmarshal() as AccurevInfo
+            println(output)
+            expect(output) {
+                property(it::host).toBe("joseph-laptop")
+                property(it::loggedIn).toBe(true)
+                property(it::loggedOut).toBe(false)
+            }
+        }
+    }
+
+    @Test fun infoModelLoggedOut() {
+        val input = this.javaClass.getResourceAsStream("logged-out-info.xml")
+
+        input.use { xml ->
+            val output = xml.unmarshal() as AccurevInfo
+            println(output)
+            expect(output) {
+                property(it::host).toBe("joseph-laptop")
+                property(it::loggedIn).toBe(false)
+                property(it::loggedOut).toBe(true)
             }
         }
     }

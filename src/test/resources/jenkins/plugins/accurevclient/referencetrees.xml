@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AcResponse
+        Command="show refs"
+        TaskId="1194">
+    <Element
+            Name="other_stream"
+            Storage="/home/joseph/other_stream"
+            Host="joseph-laptop"
+            Stream="3"
+            depot="accurev"
+            Target_trans="22"
+            Trans="22"
+            fileModTime="1514133533"
+            Type="3"
+            EOL="0"
+            user_id="1"
+            user_name="josp"/>
+</AcResponse>
