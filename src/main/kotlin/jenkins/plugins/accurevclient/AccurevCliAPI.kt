@@ -161,8 +161,8 @@ class AccurevCliAPI(
         with(accurev("show", true)) {
             add("-s", stream, "streams")
             val accurevStreams = launch().unmarshal() as AccurevStreams
-            if (accurevStreams.streams.size != 1) throw AccurevException("Stream not found")
-            return accurevStreams.streams[0]
+            if (accurevStreams.list.size != 1) throw AccurevException("Stream not found")
+            return accurevStreams.list[0]
         }
     }
 

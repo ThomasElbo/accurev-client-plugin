@@ -50,9 +50,9 @@ class AccurevModelTest {
             val output = xml.unmarshal() as AccurevStreams
             println(output)
             expect(output) {
-                property(it::streams).hasSize(10)
+                property(it::list).hasSize(10)
             }
-            expect(output.streams[0]) {
+            expect(output.list[0]) {
                 property(it::name).toBe("accurev")
                 property(it::depotName).toBe("accurev")
                 property(it::streamNumber).toBe(1)
@@ -60,13 +60,15 @@ class AccurevModelTest {
                 property(it::dynamic).isTrue()
                 property(it::startTime).toBe(timestampAdapter.unmarshal(1512169249))
                 property(it::type).toBe(AccurevStreamType.Normal)
+                property(it::children).hasSize(6)
             }
-            expect(output.streams[1]) {
+            expect(output.list[1]) {
                 property(it::name).toBe("accurev_josp")
                 property(it::depotName).toBe("accurev")
                 property(it::streamNumber).toBe(2)
                 property(it::basisStreamNumber).isNotNull { toBe(1) }
                 property(it::dynamic).isFalse()
+                property(it::parent).isNotNull { toBe(output.list[0]) }
                 property(it::startTime).toBe(timestampAdapter.unmarshal(1512169250))
                 property(it::type).toBe(AccurevStreamType.Workspace)
             }
@@ -78,7 +80,7 @@ class AccurevModelTest {
         val output = input.unmarshal() as AccurevStreams
         println(output)
         expect(output) {
-            property(it::streams).hasSize(0)
+            property(it::list).hasSize(0)
         }
     }
 
@@ -108,6 +110,7 @@ class AccurevModelTest {
                     "other_stream",
                     "accurev",
                     3,
+                    "accurev",
                     1,
                     false,
                     AccurevStreamType.Normal,
