@@ -20,7 +20,7 @@ plugins {
 }
 
 dependencies {
-    compile(kotlin("stdlib-jre8"))
+    compile(kotlin("stdlib-jre8", "1.2.10"))
 
     testCompile("junit:junit:4.12")
     testCompile("ch.tutteli:atrium-cc-en_UK-robstoll:$atriumVersion")
@@ -41,7 +41,7 @@ jenkinsPlugin {
     url = "https://wiki.jenkins.io/display/JENKINS/Accurev+Client+Plugin"
 
     coreVersion = jenkinsCoreVersion as String
-    fileExtension = "jpi"
+    fileExtension = "hpi"
     pluginFirstClassLoader = true
     workDir = file("$buildDir/work")
 

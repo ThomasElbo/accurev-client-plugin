@@ -14,7 +14,6 @@ import jenkins.plugins.accurevclient.commands.UpdateCommand
 import jenkins.plugins.accurevclient.model.AccurevDepots
 import jenkins.plugins.accurevclient.model.AccurevInfo
 import jenkins.plugins.accurevclient.model.AccurevReferenceTrees
-import jenkins.plugins.accurevclient.model.AccurevStream
 import jenkins.plugins.accurevclient.model.AccurevStreams
 import jenkins.plugins.accurevclient.model.AccurevUpdate
 import jenkins.plugins.accurevclient.model.AccurevWorkspaces
@@ -25,6 +24,7 @@ import jenkins.plugins.accurevclient.utils.unmarshal
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.UnsupportedEncodingException
+import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
 class AccurevCliAPI(
@@ -136,49 +136,65 @@ class AccurevCliAPI(
     }
 
     override fun getWorkspaces(): AccurevWorkspaces {
-        with(accurev("show", true)) {
-            add("wspaces")
-            return launch().unmarshal() as AccurevWorkspaces
+        val accurevWorkspaces = cachedAccurevWorkspaces[server, Callable {
+            with(accurev("show", true)) {
+                add("-a", "wspaces")
+                return@Callable launch().unmarshal() as AccurevWorkspaces
+            }
+        } ] ?: AccurevWorkspaces()
+        val accurevStreams = getStreams().map
+        accurevWorkspaces.list.forEach {
+            accurevStreams[it.name]?.let { stream ->
+                if (it.stream != stream) it.stream = stream
+            }
         }
+        return accurevWorkspaces
     }
 
     override fun getReferenceTrees(): AccurevReferenceTrees {
-        with(accurev("show", true)) {
-            add("refs")
-            return launch().unmarshal() as AccurevReferenceTrees
+        val accurevReferenceTrees = cachedAccurevReferenceTrees[server, Callable {
+            with(accurev("show", true)) {
+                add("refs")
+                return@Callable launch().unmarshal() as AccurevReferenceTrees
+            }
+        } ] ?: AccurevReferenceTrees()
+        val accurevStreams = getStreams().map
+        accurevReferenceTrees.list.forEach {
+            accurevStreams[it.name]?.let { stream ->
+                if (it.stream != stream) it.stream = stream
+            }
         }
+        return accurevReferenceTrees
     }
 
     override fun getDepots(): AccurevDepots {
-        with(accurev("show", true)) {
-            add("depots")
-            return launch().unmarshal() as AccurevDepots
-        }
-    }
-
-    @Throws(AccurevException::class)
-    override fun getStream(stream: String): AccurevStream {
-        with(accurev("show", true)) {
-            add("-s", stream, "streams")
-            val accurevStreams = launch().unmarshal() as AccurevStreams
-            if (accurevStreams.list.size != 1) throw AccurevException("Stream not found")
-            return accurevStreams.list[0]
-        }
+        return cachedAccurevDepots[server, Callable {
+            with(accurev("show", true)) {
+                add("depots")
+                return@Callable launch().unmarshal() as AccurevDepots
+            }
+        } ] ?: AccurevDepots()
     }
 
     override fun getStreams(depot: String): AccurevStreams {
-        with(accurev("show", true)) {
-            if (depot.isNotBlank()) add("-p", depot)
-            add("streams")
-            return launch().unmarshal() as AccurevStreams
-        }
+        val key = if (depot.isNotBlank()) "$server:$:$depot" else server
+        return cachedAccurevStreams[key, Callable {
+            with(accurev("show", true)) {
+                if (depot.isNotBlank()) add("-p", depot)
+                add("streams")
+                return@Callable launch().unmarshal() as AccurevStreams
+            }
+        } ] ?: AccurevStreams()
     }
 
-    override fun getChildStreams(stream: String): AccurevStreams {
-        with(accurev("show", true)) {
-            add("-R", "-s", stream, "streams")
-            return launch().unmarshal() as AccurevStreams
-        }
+    override fun getChildStreams(depot: String, stream: String): AccurevStreams {
+        val key = "$server:$:$depot:$:$stream"
+        return cachedAccurevStreams[key, Callable {
+            with(accurev("show", true)) {
+                add("-R", "-s", stream, "streams")
+                return@Callable launch().unmarshal() as AccurevStreams
+            }
+        } ] ?: AccurevStreams()
     }
 
     override fun getUpdatedElements(
@@ -281,6 +297,10 @@ class AccurevCliAPI(
 
     companion object {
         val TIMEOUT: Int = Integer.getInteger("${AccurevClient::class.java.name}.timeOut", 10)
+        @Transient private val cachedAccurevStreams: Cache<String, AccurevStreams> = Cache(3, TimeUnit.HOURS)
+        @Transient private val cachedAccurevDepots: Cache<String, AccurevDepots> = Cache(3, TimeUnit.HOURS)
+        @Transient private val cachedAccurevWorkspaces: Cache<String, AccurevWorkspaces> = Cache(3, TimeUnit.HOURS)
+        @Transient private val cachedAccurevReferenceTrees: Cache<String, AccurevReferenceTrees> = Cache(3, TimeUnit.HOURS)
     }
 
     private fun ArgumentListBuilder.launch(): String = this@AccurevCliAPI.launchCommand(this)

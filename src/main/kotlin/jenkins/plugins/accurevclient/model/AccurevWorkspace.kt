@@ -2,6 +2,7 @@ package jenkins.plugins.accurevclient.model
 
 import jenkins.plugins.accurevclient.utils.TimestampAdapter
 import java.util.Date
+import javax.xml.bind.Unmarshaller
 import javax.xml.bind.annotation.XmlAccessType
 import javax.xml.bind.annotation.XmlAccessorType
 import javax.xml.bind.annotation.XmlAttribute
@@ -13,8 +14,15 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter
 @XmlRootElement(name = "AcResponse")
 data class AccurevWorkspaces(
     @field:XmlElement(name = "Element")
-    val elements: MutableList<AccurevWorkspace> = mutableListOf()
-)
+    val list: MutableList<AccurevWorkspace> = mutableListOf()
+) {
+    @Transient lateinit var map: Map<String, AccurevWorkspace>
+
+    @Suppress("unused", "UNUSED_PARAMETER")
+    fun afterUnmarshal(unmarshaller: Unmarshaller, any: Any) {
+        map = list.associateBy { it.name }
+    }
+}
 
 @XmlAccessorType(XmlAccessType.FIELD)
 data class AccurevWorkspace(
@@ -25,7 +33,7 @@ data class AccurevWorkspace(
     @field:XmlAttribute(name = "Host")
     val host: String = "",
     @field:XmlAttribute(name = "Stream")
-    val stream: Long = 0,
+    val streamNumber: Long = 0,
     @field:XmlAttribute(name = "Trans")
     val transaction: Long = 0,
     @field:XmlAttribute
@@ -35,4 +43,6 @@ data class AccurevWorkspace(
     @field:XmlJavaTypeAdapter(TimestampAdapter::class)
     @field:XmlAttribute(name = "fileModTime")
     val lastModified: Date = Date(0)
-)
+) {
+    @Transient var stream: AccurevStream? = null
+}

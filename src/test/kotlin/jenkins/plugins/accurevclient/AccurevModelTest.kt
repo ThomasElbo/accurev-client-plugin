@@ -139,7 +139,7 @@ class AccurevModelTest {
         input.use { xml ->
             val output = xml.unmarshal() as AccurevWorkspaces
             println(output)
-            expect(output.elements[0]) {
+            expect(output.list[0]) {
                 property(it::name).toBe("accurev_josp")
             }
         }

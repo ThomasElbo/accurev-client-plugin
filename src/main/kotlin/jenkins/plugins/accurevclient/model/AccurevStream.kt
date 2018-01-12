@@ -26,7 +26,7 @@ data class AccurevStreams(
     val list: MutableList<AccurevStream> = mutableListOf()
 ) {
 
-    lateinit var map: Map<String, AccurevStream>
+    @Transient lateinit var map: Map<String, AccurevStream>
 
     @Suppress("unused", "UNUSED_PARAMETER")
     fun afterUnmarshal(unmarshaller: Unmarshaller, any: Any) {
@@ -72,7 +72,7 @@ data class AccurevStream(
         }
 
     fun isReceivingChangesFromParent(): Boolean {
-        return when(type) {
+        return when (type) {
             Normal -> time == null
             Snapshot -> false
             Workspace, PassThrough, Gated, Staging -> true
