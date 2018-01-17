@@ -6,6 +6,7 @@ val jvmVersion by project
 val jacocoVersion by project
 val ktlintVersion by project
 val jenkinsCoreVersion by project
+val jenkinsTestHarnessVersion by project
 val jenkinsCredentialsPluginVersion by project
 val sezpozVersion by project
 val atriumVersion by project
@@ -29,7 +30,7 @@ dependencies {
 
     jenkinsPlugins("org.jenkins-ci.plugins:credentials:$jenkinsCredentialsPluginVersion")
 
-    jenkinsTest("org.jenkins-ci.main:jenkins-test-harness:2.32") { isTransitive = true }
+    jenkinsTest("org.jenkins-ci.main:jenkins-test-harness:$jenkinsTestHarnessVersion") { isTransitive = true }
 
     kapt("net.java.sezpoz:sezpoz:$sezpozVersion")
 }
