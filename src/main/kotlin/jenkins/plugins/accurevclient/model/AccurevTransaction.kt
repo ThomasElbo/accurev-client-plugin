@@ -45,7 +45,9 @@ data class AccurevTransactionVersion(
     @field:XmlJavaTypeAdapter(AccurevPathAdapter::class)
     val path: String = "",
     @field:XmlAttribute
-    val eid: Long = 0
+    val eid: Long = 0,
+    @field:XmlElement
+    val issueNum: Long? = null
 )
 
 @XmlType

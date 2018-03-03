@@ -11,10 +11,13 @@ import jenkins.plugins.accurevclient.commands.HistCommand
 import jenkins.plugins.accurevclient.commands.LoginCommand
 import jenkins.plugins.accurevclient.commands.PopulateCommand
 import jenkins.plugins.accurevclient.commands.UpdateCommand
+import jenkins.plugins.accurevclient.model.AccurevDepot
 import jenkins.plugins.accurevclient.model.AccurevDepots
 import jenkins.plugins.accurevclient.model.AccurevInfo
 import jenkins.plugins.accurevclient.model.AccurevReferenceTrees
+import jenkins.plugins.accurevclient.model.AccurevStream
 import jenkins.plugins.accurevclient.model.AccurevStreams
+import jenkins.plugins.accurevclient.model.AccurevTransaction
 import jenkins.plugins.accurevclient.model.AccurevUpdate
 import jenkins.plugins.accurevclient.model.AccurevWorkspaces
 import jenkins.plugins.accurevclient.utils.defaultCharset
@@ -185,6 +188,27 @@ class AccurevCliAPI(
                 return@Callable launch().unmarshal() as AccurevStreams
             }
         } ] ?: AccurevStreams()
+    }
+
+    override fun fetchDepot(depot: String): AccurevDepot? {
+        val depots = getDepots()
+        return depots.map[depot]
+    }
+
+    override fun fetchStream(depot: String, stream: String): AccurevStream? {
+        val streams = getStreams(depot)
+        return streams.map[stream]
+    }
+
+    override fun fetchTransaction(stream: String): AccurevTransaction {
+        with(accurev("hist", true)) {
+            val accurevTransaction = add("-t", "now.1", "-s", stream).launch().unmarshal() as AccurevTransaction
+            return accurevTransaction
+        }
+    }
+
+    override fun fetchTransaction(stream: AccurevStream): AccurevTransaction {
+        return fetchTransaction(stream.name)
     }
 
     override fun getChildStreams(depot: String, stream: String): AccurevStreams {

@@ -12,8 +12,8 @@ val sezpozVersion by project
 val atriumVersion by project
 
 plugins {
-    kotlin("jvm") version "1.2.10"
-    kotlin("kapt") version "1.2.10"
+    kotlin("jvm") version "1.2.20"
+    kotlin("kapt") version "1.2.20"
     id("org.jenkins-ci.jpi") version "0.25.0"
     id("org.jetbrains.dokka") version "0.9.15"
     id("com.diffplug.gradle.spotless") version "3.7.0"
@@ -21,7 +21,6 @@ plugins {
 }
 
 dependencies {
-    compile(kotlin("stdlib-jre8", "1.2.10"))
 
     testCompile("junit:junit:4.12")
     testCompile("ch.tutteli:atrium-cc-en_UK-robstoll:$atriumVersion")
@@ -29,6 +28,7 @@ dependencies {
     testCompile("com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0-alpha02")
 
     jenkinsPlugins("org.jenkins-ci.plugins:credentials:$jenkinsCredentialsPluginVersion")
+    jenkinsPlugins("org.jenkins-ci.plugins.kotlin:kotlin-v1-stdlib-jdk8:1.0-SNAPSHOT")
 
     jenkinsTest("org.jenkins-ci.main:jenkins-test-harness:$jenkinsTestHarnessVersion") { isTransitive = true }
 

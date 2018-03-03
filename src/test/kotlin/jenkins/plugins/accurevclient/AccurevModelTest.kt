@@ -34,9 +34,9 @@ class AccurevModelTest {
             val depots = xml.unmarshal() as AccurevDepots
             println(depots)
             expect(depots) {
-                property(it::elements).hasSize(2)
+                property(it::list).hasSize(2)
             }
-            expect(depots.elements[0]) {
+            expect(depots.list[0]) {
                 property(it::number).toBe(1)
                 property(it::name).toBe("accurev")
             }
