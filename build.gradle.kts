@@ -2,14 +2,14 @@ import org.jenkinsci.gradle.plugins.jpi.JpiDeveloper
 import org.jenkinsci.gradle.plugins.jpi.JpiLicense
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val jvmVersion by project
-val jacocoVersion by project
-val ktlintVersion by project
-val jenkinsCoreVersion by project
-val jenkinsTestHarnessVersion by project
-val jenkinsCredentialsPluginVersion by project
-val sezpozVersion by project
-val atriumVersion by project
+val jvmVersion: Any? by project
+val jacocoVersion: Any? by project
+val ktlintVersion: Any? by project
+val jenkinsCoreVersion: Any? by project
+val jenkinsTestHarnessVersion: Any? by project
+val jenkinsCredentialsPluginVersion: Any? by project
+val sezpozVersion: Any? by project
+val atriumVersion: Any? by project
 
 plugins {
     kotlin("jvm") version "1.2.20"
@@ -94,9 +94,10 @@ tasks {
 }
 
 task<Wrapper>("wrapper") {
-    gradleVersion = "4.3.1"
+    gradleVersion = "4.9"
     distributionType = Wrapper.DistributionType.ALL
 }
+
 
 repositories {
     maven(url = "https://repo.jenkins-ci.org/public/")
