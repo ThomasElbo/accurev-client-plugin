@@ -24,7 +24,8 @@ val spekVersion = "1.1.5"
 val junitPlatformVersion = "1.1.0"
 dependencies {
 	testRuntime("org.junit.platform:junit-platform-gradle-plugin:1.2.0")
-    testRuntime("org.junit.jupiter.junit-jupiter-api:5.2.0")
+    testRuntime("org.junit.jupiter:junit-jupiter-api:5.2.0")
+    testCompile("org.junit.jupiter:junit-jupiter-api:5.2.0")
     testCompile("ch.tutteli:atrium-cc-en_UK-robstoll:$atriumVersion")
     testCompile("ch.tutteli:atrium-verbs:$atriumVersion")
     testCompile("com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0-alpha02")
@@ -32,6 +33,7 @@ dependencies {
     jenkinsPlugins("org.jenkins-ci.plugins:credentials:$jenkinsCredentialsPluginVersion")
     jenkinsPlugins("org.jenkins-ci.plugins.kotlin:kotlin-v1-stdlib-jdk8:1.0-SNAPSHOT")
     jenkinsTest("org.jenkins-ci.main:jenkins-test-harness:$jenkinsTestHarnessVersion") { isTransitive = true }
+
     kapt("net.java.sezpoz:sezpoz:$sezpozVersion")
 }
 
