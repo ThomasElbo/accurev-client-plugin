@@ -12,26 +12,26 @@ val sezpozVersion: Any? by project
 val atriumVersion: Any? by project
 
 plugins {
-    kotlin("jvm") version "1.2.20"
-    kotlin("kapt") version "1.2.20"
+    kotlin("jvm") version "1.2.51"
+    kotlin("kapt") version "1.2.51"
     id("org.jenkins-ci.jpi") version "0.25.0"
     id("org.jetbrains.dokka") version "0.9.15"
     id("com.diffplug.gradle.spotless") version "3.7.0"
     jacoco
+	java
 }
-
+val spekVersion = "1.1.5"
+val junitPlatformVersion = "1.1.0"
 dependencies {
-
-    testCompile("junit:junit:4.12")
+	testRuntime("org.junit.platform:junit-platform-gradle-plugin:1.2.0")
+    testRuntime("org.junit.jupiter.junit-jupiter-api:5.2.0")
     testCompile("ch.tutteli:atrium-cc-en_UK-robstoll:$atriumVersion")
     testCompile("ch.tutteli:atrium-verbs:$atriumVersion")
     testCompile("com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0-alpha02")
 
     jenkinsPlugins("org.jenkins-ci.plugins:credentials:$jenkinsCredentialsPluginVersion")
     jenkinsPlugins("org.jenkins-ci.plugins.kotlin:kotlin-v1-stdlib-jdk8:1.0-SNAPSHOT")
-
     jenkinsTest("org.jenkins-ci.main:jenkins-test-harness:$jenkinsTestHarnessVersion") { isTransitive = true }
-
     kapt("net.java.sezpoz:sezpoz:$sezpozVersion")
 }
 
@@ -102,6 +102,7 @@ task<Wrapper>("wrapper") {
 repositories {
     maven(url = "https://repo.jenkins-ci.org/public/")
     jcenter()
+	mavenCentral()
 }
 
 // Workaround for https://issues.jenkins-ci.org/browse/JENKINS-48353
