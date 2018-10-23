@@ -1,18 +1,7 @@
 package jenkins.plugins.accurevclient
 
-import jenkins.plugins.accurevclient.commands.HistCommand
-import jenkins.plugins.accurevclient.commands.LoginCommand
-import jenkins.plugins.accurevclient.commands.PopulateCommand
-import jenkins.plugins.accurevclient.commands.UpdateCommand
-import jenkins.plugins.accurevclient.model.AccurevDepot
-import jenkins.plugins.accurevclient.model.AccurevDepots
-import jenkins.plugins.accurevclient.model.AccurevInfo
-import jenkins.plugins.accurevclient.model.AccurevReferenceTrees
-import jenkins.plugins.accurevclient.model.AccurevStream
-import jenkins.plugins.accurevclient.model.AccurevStreams
-import jenkins.plugins.accurevclient.model.AccurevTransaction
-import jenkins.plugins.accurevclient.model.AccurevUpdate
-import jenkins.plugins.accurevclient.model.AccurevWorkspaces
+import jenkins.plugins.accurevclient.commands.*
+import jenkins.plugins.accurevclient.model.*
 
 interface AccurevClient {
     fun login(): LoginCommand
@@ -22,6 +11,8 @@ interface AccurevClient {
     fun update(): UpdateCommand
 
     fun populate(): PopulateCommand
+
+    fun changelog() : ChangelogCommand
 
     fun syncTime()
 
@@ -44,6 +35,10 @@ interface AccurevClient {
     fun fetchTransaction(stream: AccurevStream): AccurevTransaction
 
     fun getChildStreams(depot: String, stream: String): AccurevStreams
+
+    fun fetchStreamTransactionHistory(stream: String, timeSpec: String) : AccurevTransactions
+
+    fun getUpdatesFromParents( depot : String, stream : String, timeSpec : Long ) : AccurevStream?
 
     fun getInfo(): AccurevInfo
 

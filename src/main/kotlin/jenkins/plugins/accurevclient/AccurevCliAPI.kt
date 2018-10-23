@@ -1,5 +1,6 @@
 package jenkins.plugins.accurevclient
 
+import com.sun.corba.se.spi.ior.ObjectId
 import hudson.EnvVars
 import hudson.FilePath
 import hudson.Launcher
@@ -7,26 +8,13 @@ import hudson.Launcher.LocalLauncher
 import hudson.model.TaskListener
 import hudson.util.ArgumentListBuilder
 import hudson.util.Secret
-import jenkins.plugins.accurevclient.commands.HistCommand
-import jenkins.plugins.accurevclient.commands.LoginCommand
-import jenkins.plugins.accurevclient.commands.PopulateCommand
-import jenkins.plugins.accurevclient.commands.UpdateCommand
-import jenkins.plugins.accurevclient.model.AccurevDepot
-import jenkins.plugins.accurevclient.model.AccurevDepots
-import jenkins.plugins.accurevclient.model.AccurevInfo
-import jenkins.plugins.accurevclient.model.AccurevReferenceTrees
-import jenkins.plugins.accurevclient.model.AccurevStream
-import jenkins.plugins.accurevclient.model.AccurevStreams
-import jenkins.plugins.accurevclient.model.AccurevTransaction
-import jenkins.plugins.accurevclient.model.AccurevUpdate
-import jenkins.plugins.accurevclient.model.AccurevWorkspaces
+import jenkins.plugins.accurevclient.commands.*
+import jenkins.plugins.accurevclient.model.*
 import jenkins.plugins.accurevclient.utils.defaultCharset
 import jenkins.plugins.accurevclient.utils.isNotEmpty
 import jenkins.plugins.accurevclient.utils.rootPath
 import jenkins.plugins.accurevclient.utils.unmarshal
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.io.UnsupportedEncodingException
+import java.io.*
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
@@ -138,6 +126,44 @@ class AccurevCliAPI(
         }
     }
 
+    override fun changelog(): ChangelogCommand {
+        return object : ChangelogCommand {
+
+            override fun excludes(var1: String): ChangelogCommand {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun excludes(var1: ObjectId): ChangelogCommand {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun includes(var1: String): ChangelogCommand {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun includes(var1: ObjectId): ChangelogCommand {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun to(var1: Writer): ChangelogCommand {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun max(var1: Int): ChangelogCommand {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun abort() {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun execute() {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+        }
+    }
+
     override fun getWorkspaces(): AccurevWorkspaces {
         val accurevWorkspaces = cachedAccurevWorkspaces[server, Callable {
             with(accurev("show", true)) {
@@ -202,8 +228,8 @@ class AccurevCliAPI(
 
     override fun fetchTransaction(stream: String): AccurevTransaction {
         with(accurev("hist", true)) {
-            val accurevTransaction = add("-t", "now.1", "-s", stream).launch().unmarshal() as AccurevTransaction
-            return accurevTransaction
+            val accurevTransaction = add("-t", "now.1", "-s", stream).launch().unmarshal() as AccurevTransactions
+            return accurevTransaction.transactions[0]
         }
     }
 
@@ -221,6 +247,13 @@ class AccurevCliAPI(
         } ] ?: AccurevStreams()
     }
 
+    override fun fetchStreamTransactionHistory(stream: String, timeSpec: String) : AccurevTransactions {
+        with(accurev("hist", true)) {
+            val accurevTransactions = add("-t", timeSpec, "-s", stream).launch().unmarshal() as AccurevTransactions
+            return accurevTransactions
+        }
+    }
+
     override fun getUpdatedElements(
         stream: String,
         latestTransaction: Long,
@@ -232,6 +265,24 @@ class AccurevCliAPI(
             add("-t", "$latestTransaction-$previousTransaction", "-i")
             return launch().unmarshal() as AccurevUpdate
         }
+    }
+
+    override fun getUpdatesFromParents( depot : String, stream : String, timeSpec : Long ) : AccurevStream? {
+        var s = this.fetchStream(depot, stream)
+        var highestUpdate = s
+        var ts = timeSpec
+
+        while( s != null ){
+            var at = fetchTransaction(s.name)
+                if (at.id > ts) {
+                   highestUpdate = s
+                    ts = at.id
+                }
+
+            s = this.fetchStream(depot, s.parent?.name ?: "")
+        }
+
+        return highestUpdate
     }
 
     override fun syncTime() {
