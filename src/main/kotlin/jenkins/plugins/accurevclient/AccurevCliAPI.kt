@@ -15,6 +15,7 @@ import jenkins.plugins.accurevclient.utils.isNotEmpty
 import jenkins.plugins.accurevclient.utils.rootPath
 import jenkins.plugins.accurevclient.utils.unmarshal
 import java.io.*
+import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
@@ -228,7 +229,8 @@ class AccurevCliAPI(
 
     override fun fetchTransaction(stream: String): AccurevTransaction {
         with(accurev("hist", true)) {
-            val accurevTransaction = add("-t", "now.1", "-s", stream).launch().unmarshal() as AccurevTransactions
+            var accurevTransaction = add("-t", "now.1", "-s", stream).launch().unmarshal() as AccurevTransactions
+            accurevTransaction.transactions[0].stream = stream
             return accurevTransaction.transactions[0]
         }
     }
@@ -247,9 +249,10 @@ class AccurevCliAPI(
         } ] ?: AccurevStreams()
     }
 
-    override fun fetchStreamTransactionHistory(stream: String, timeSpec: String) : AccurevTransactions {
+    @JvmOverloads
+    override fun fetchStreamTransactionHistory(stream: String, timeSpecLower: String, timeSpecUpper: String) : AccurevTransactions {
         with(accurev("hist", true)) {
-            val accurevTransactions = add("-t", timeSpec, "-s", stream).launch().unmarshal() as AccurevTransactions
+            val accurevTransactions = add("-t", "$timeSpecLower-$timeSpecUpper", "-s", stream).launch().unmarshal() as AccurevTransactions // Range
             return accurevTransactions
         }
     }
@@ -267,22 +270,33 @@ class AccurevCliAPI(
         }
     }
 
-    override fun getUpdatesFromParents( depot : String, stream : String, timeSpec : Long ) : AccurevStream? {
+    override fun getUpdatesFromAncestors( depot: String, stream : String, timeSpec : Long ) : MutableCollection<AccurevTransaction>{
         var s = this.fetchStream(depot, stream)
-        var highestUpdate = s
         var ts = timeSpec
+        var updates: MutableCollection<AccurevTransaction> = mutableListOf()
 
         while( s != null ){
-            var at = fetchTransaction(s.name)
-                if (at.id > ts) {
-                   highestUpdate = s
-                    ts = at.id
+            var listOfTransactions = fetchStreamTransactionHistory(s.name, timeSpec.toString())
+
+            if(listOfTransactions.transactions.isEmpty()) return updates
+
+            var at = listOfTransactions.transactions[0]
+
+            if (at.id > ts) {
+                updates.addAll(listOfTransactions.transactions)
+                ts = at.id
+            }
+
+            if(s != null){
+                if(s.type == (AccurevStreamType.Snapshot) ||  ((s.time != null) && (s.time!!.before( Date(System.currentTimeMillis()))))){
+                    break
                 }
+            }
 
             s = this.fetchStream(depot, s.parent?.name ?: "")
-        }
 
-        return highestUpdate
+        }
+        return updates
     }
 
     override fun syncTime() {

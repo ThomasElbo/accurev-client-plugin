@@ -13,6 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import java.util.Collection;
 import java.util.Collections;
 
 import static org.junit.Assume.assumeTrue;
@@ -108,14 +109,9 @@ public class AccurevClientJavaTest {
         AccurevClient client = accurev.getClient();
         client.login().username(username).password(Secret.fromString(password)).execute();
 
-        AccurevStream as = client.getUpdatesFromParents("DummyProj", "LowestStream", client.fetchTransaction("LowestStream").getId());
+        Collection<AccurevTransaction> as = client.getUpdatesFromAncestors("DummyProj", "LowestStream", client.fetchTransaction("LowestStream").getId());
 
-        System.out.println("LowestStream has id " + client.fetchTransaction("LowestStream").getId());
-        System.out.println( "Highest stream: " + as.getName() + ", with id: " + client.fetchTransaction(as.getName()).getId());
-
-        for(AccurevStream a : client.getChildStreams("DummyProj", as.getName()).getList()){
-            System.out.println("Streams that needs to be updated: " + a.getName());
-        }
+        for(AccurevTransaction at : as) System.out.println(at.getStream() + ", " + at.getComment());
     }
 
 }

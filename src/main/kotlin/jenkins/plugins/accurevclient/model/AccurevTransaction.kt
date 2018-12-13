@@ -21,6 +21,7 @@ data class AccurevTransactions(
 )
 
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "AcResponse")
 data class AccurevTransaction(
     @field:XmlAttribute(required = true)
     val id: Long = 0,
@@ -36,7 +37,7 @@ data class AccurevTransaction(
     @field:XmlElement
     val version: AccurevTransactionVersion? = null,
     @field:XmlElement
-    val stream: AccurevStream? = null
+    var stream: String? = null
 )
 
 @XmlAccessorType(XmlAccessType.FIELD)
