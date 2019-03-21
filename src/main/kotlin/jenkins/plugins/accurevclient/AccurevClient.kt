@@ -1,9 +1,14 @@
 package jenkins.plugins.accurevclient
 
+import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials
 import jenkins.plugins.accurevclient.commands.*
 import jenkins.plugins.accurevclient.model.*
+import kotlin.properties.Delegates
 
 interface AccurevClient {
+
+    var credentials: StandardUsernameCredentials
+
     fun login(): LoginCommand
 
     fun hist(): HistCommand

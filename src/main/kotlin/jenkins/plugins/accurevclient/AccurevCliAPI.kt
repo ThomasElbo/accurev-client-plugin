@@ -1,5 +1,6 @@
 package jenkins.plugins.accurevclient
 
+import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials
 import com.sun.corba.se.spi.ior.ObjectId
 import hudson.EnvVars
 import hudson.FilePath
@@ -18,15 +19,18 @@ import java.io.*
 import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
+import kotlin.properties.Delegates
 
 class AccurevCliAPI(
-    private val workspace: FilePath,
-    private val environment: EnvVars,
-    val accurevExe: String,
-    val server: String,
-    private val listener: TaskListener
+        private val workspace: FilePath,
+        private val environment: EnvVars,
+        val accurevExe: String,
+        val server: String,
+        private val listener: TaskListener
 ) : AccurevClient {
     @Transient private val launcher: Launcher
+
+    override var credentials: StandardUsernameCredentials by Delegates.notNull()
 
     init {
         environment.putIfAbsent("ACCUREV_HOME", workspace.rootPath())
@@ -253,6 +257,7 @@ class AccurevCliAPI(
     override fun fetchStreamTransactionHistory(stream: String, timeSpecLower: String, timeSpecUpper: String) : AccurevTransactions {
         with(accurev("hist", true)) {
             val accurevTransactions = add("-t", "$timeSpecLower-$timeSpecUpper", "-s", stream).launch().unmarshal() as AccurevTransactions // Range
+            accurevTransactions.transactions.forEach { transaction -> transaction.stream = stream }
             return accurevTransactions
         }
     }
@@ -274,17 +279,13 @@ class AccurevCliAPI(
         var s = this.fetchStream(depot, stream)
         var ts = timeSpec
         var updates: MutableCollection<AccurevTransaction> = mutableListOf()
+        //updates.add(fetchTransaction(s!!.name))
 
         while( s != null ){
             var listOfTransactions = fetchStreamTransactionHistory(s.name, timeSpec.toString())
 
-            if(listOfTransactions.transactions.isEmpty()) return updates
-
-            var at = listOfTransactions.transactions[0]
-
-            if (at.id > ts) {
-                updates.addAll(listOfTransactions.transactions)
-                ts = at.id
+            if(!listOfTransactions.transactions.isEmpty()) {
+                listOfTransactions.transactions.forEach { at -> if(at.id > ts) updates.add(at) }
             }
 
             if(s != null){
