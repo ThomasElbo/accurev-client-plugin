@@ -12,4 +12,6 @@ interface PopulateCommand : AccurevCommand {
     fun elements(set: Set<String>): PopulateCommand
 
     fun listFile(listFile: FilePath): PopulateCommand
+    fun shallow(shallow: Boolean): PopulateCommand
+    fun shallow(): PopulateCommand
 }

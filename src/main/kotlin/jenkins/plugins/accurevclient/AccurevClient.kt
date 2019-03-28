@@ -1,13 +1,18 @@
 package jenkins.plugins.accurevclient
 
-import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials
+
+import com.cloudbees.jenkins.plugins.sshcredentials.SSHUserPrivateKey
+import com.cloudbees.plugins.credentials.CredentialsMatcher
+import com.cloudbees.plugins.credentials.CredentialsMatchers
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
 import jenkins.plugins.accurevclient.commands.*
 import jenkins.plugins.accurevclient.model.*
+import java.io.InputStream
 import kotlin.properties.Delegates
 
 interface AccurevClient {
 
-    var credentials: StandardUsernameCredentials
+    var credentials: StandardUsernamePasswordCredentials?
 
     fun login(): LoginCommand
 
@@ -56,5 +61,8 @@ interface AccurevClient {
 
     companion object {
         val verbose = java.lang.Boolean.getBoolean("${AccurevClient::class.java.name}.verbose")
+        val CREDENTIALS_MATCHER: CredentialsMatcher = CredentialsMatchers.anyOf(CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials::class.java), CredentialsMatchers.instanceOf(SSHUserPrivateKey::class.java!!))
     }
+
+    fun getFile(stream: String, path: String): InputStream
 }

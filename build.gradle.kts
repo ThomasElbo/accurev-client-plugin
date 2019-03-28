@@ -30,9 +30,10 @@ dependencies {
     testCompile("ch.tutteli:atrium-verbs:$atriumVersion")
     testCompile("com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0-alpha02")
 
-    jenkinsPlugins("org.jenkins-ci.plugins:credentials:$jenkinsCredentialsPluginVersion")
     //jenkinsPlugins("org.jenkins-ci.plugins.kotlin:kotlin-v1-stdlib-jdk8:1.0-SNAPSHOT")
     jenkinsTest("org.jenkins-ci.main:jenkins-test-harness:$jenkinsTestHarnessVersion") { isTransitive = true }
+    jenkinsPlugins(group = "org.jenkins-ci.plugins", name =  "credentials", version = "2.1.18")
+    jenkinsPlugins(group = "org.jenkins-ci.plugins", name = "credentials-binding", version = "1.18")
 
     kapt("net.java.sezpoz:sezpoz:$sezpozVersion")
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51")

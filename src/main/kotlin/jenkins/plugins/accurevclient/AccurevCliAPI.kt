@@ -1,6 +1,6 @@
 package jenkins.plugins.accurevclient
 
-import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
 import com.sun.corba.se.spi.ior.ObjectId
 import hudson.EnvVars
 import hudson.FilePath
@@ -16,21 +16,21 @@ import jenkins.plugins.accurevclient.utils.isNotEmpty
 import jenkins.plugins.accurevclient.utils.rootPath
 import jenkins.plugins.accurevclient.utils.unmarshal
 import java.io.*
+import java.nio.file.Paths
 import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
-import kotlin.properties.Delegates
 
 class AccurevCliAPI(
         private val workspace: FilePath,
         private val environment: EnvVars,
         val accurevExe: String,
         val server: String,
-        private val listener: TaskListener
+        @Transient private val listener: TaskListener
 ) : AccurevClient {
     @Transient private val launcher: Launcher
 
-    override var credentials: StandardUsernameCredentials by Delegates.notNull()
+    override var credentials: StandardUsernamePasswordCredentials? = null
 
     init {
         environment.putIfAbsent("ACCUREV_HOME", workspace.rootPath())
@@ -72,9 +72,19 @@ class AccurevCliAPI(
     override fun populate(): PopulateCommand {
         return object : PopulateCommand {
             val args = accurev("pop").add("-L", workspace.remote)
+            var shallow = false
 
             override fun stream(stream: String): PopulateCommand {
                 args.add("-v", stream)
+                return this
+            }
+
+            override fun shallow() : PopulateCommand {
+                return this.shallow(true)
+            }
+
+            override fun shallow(shallow : Boolean) : PopulateCommand {
+                this.shallow = shallow
                 return this
             }
 
@@ -219,6 +229,13 @@ class AccurevCliAPI(
                 return@Callable launch().unmarshal() as AccurevStreams
             }
         } ] ?: AccurevStreams()
+    }
+
+    override fun getFile(stream: String, path: String) : InputStream {
+        populate().elements(hashSetOf(path)).stream(stream).execute()
+        val aPath = Paths.get("").toAbsolutePath().toString()
+        val f =  File("$workspace/$path")
+        return f.inputStream()
     }
 
     override fun fetchDepot(depot: String): AccurevDepot? {
