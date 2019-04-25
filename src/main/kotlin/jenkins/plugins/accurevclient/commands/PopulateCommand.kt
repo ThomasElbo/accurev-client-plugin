@@ -14,4 +14,6 @@ interface PopulateCommand : AccurevCommand {
     fun listFile(listFile: FilePath): PopulateCommand
     fun shallow(shallow: Boolean): PopulateCommand
     fun shallow(): PopulateCommand
+
+    fun overrideFile(): PopulateCommand
 }

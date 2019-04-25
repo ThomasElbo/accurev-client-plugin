@@ -108,6 +108,11 @@ class AccurevCliAPI(
                 return this
             }
 
+            override fun overrideFile(): PopulateCommand {
+                args.add("-O")
+                return this
+            }
+
             @Throws(AccurevException::class, InterruptedException::class)
             override fun execute() {
                 launchCommand(args)
@@ -231,9 +236,8 @@ class AccurevCliAPI(
         } ] ?: AccurevStreams()
     }
 
-    override fun getFile(stream: String, path: String) : InputStream {
-        populate().elements(hashSetOf(path)).stream(stream).execute()
-        val aPath = Paths.get("").toAbsolutePath().toString()
+    override fun getFile(stream: String, path: String, transaction: String) : InputStream {
+        populate().timespec(transaction).elements(hashSetOf(path)).stream(stream).overrideFile().execute()
         val f =  File("$workspace/$path")
         return f.inputStream()
     }
