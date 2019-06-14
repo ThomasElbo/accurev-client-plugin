@@ -22,7 +22,7 @@ interface AccurevClient {
 
     fun populate(): PopulateCommand
 
-    fun changelog() : ChangelogCommand
+    fun filesFind(): FilesCommand
 
     fun syncTime()
 
@@ -64,5 +64,5 @@ interface AccurevClient {
         val CREDENTIALS_MATCHER: CredentialsMatcher = CredentialsMatchers.anyOf(CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials::class.java), CredentialsMatchers.instanceOf(SSHUserPrivateKey::class.java!!))
     }
 
-    fun getFile(stream: String, path: String, transaction: String = "highest"): InputStream
+    fun getFile(stream: String, path: String, transaction: String = "highest"): String
 }

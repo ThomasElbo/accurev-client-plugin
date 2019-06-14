@@ -1,7 +1,7 @@
 package jenkins.plugins.accurevclient
 
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
-import com.sun.corba.se.spi.ior.ObjectId
+
 import hudson.EnvVars
 import hudson.FilePath
 import hudson.Launcher
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 class AccurevCliAPI(
         private val workspace: FilePath,
-        private val environment: EnvVars,
+        private val environment: EnvVars = EnvVars(),
         val accurevExe: String,
         val server: String,
         @Transient private val listener: TaskListener
@@ -67,6 +67,10 @@ class AccurevCliAPI(
                 launchCommand(args)
             }
         }
+    }
+
+    override fun filesFind(): FilesCommand {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun populate(): PopulateCommand {
@@ -120,6 +124,10 @@ class AccurevCliAPI(
         }
     }
 
+
+
+
+
     override fun update(): UpdateCommand {
         return object : UpdateCommand {
             val args = accurev("update", true)
@@ -146,43 +154,7 @@ class AccurevCliAPI(
         }
     }
 
-    override fun changelog(): ChangelogCommand {
-        return object : ChangelogCommand {
 
-            override fun excludes(var1: String): ChangelogCommand {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun excludes(var1: ObjectId): ChangelogCommand {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun includes(var1: String): ChangelogCommand {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun includes(var1: ObjectId): ChangelogCommand {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun to(var1: Writer): ChangelogCommand {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun max(var1: Int): ChangelogCommand {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun abort() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun execute() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-        }
-    }
 
     override fun getWorkspaces(): AccurevWorkspaces {
         val accurevWorkspaces = cachedAccurevWorkspaces[server, Callable {
@@ -236,10 +208,15 @@ class AccurevCliAPI(
         } ] ?: AccurevStreams()
     }
 
-    override fun getFile(stream: String, path: String, transaction: String) : InputStream {
-        populate().timespec(transaction).elements(hashSetOf(path)).stream(stream).overrideFile().execute()
+    override fun getFile(stream: String, path: String, transaction: String) : String {
+        try {
+            populate().timespec(transaction).elements(hashSetOf(path)).stream(stream).overrideFile().execute()
+        }catch(e: AccurevException) {
+            return "";
+        }
         val f =  File("$workspace/$path")
-        return f.inputStream()
+        val content = f.readText()
+        return content
     }
 
     override fun fetchDepot(depot: String): AccurevDepot? {
