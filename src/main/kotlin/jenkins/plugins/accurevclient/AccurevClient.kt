@@ -22,7 +22,7 @@ interface AccurevClient {
 
     fun populate(): PopulateCommand
 
-    fun filesFind(): FilesCommand
+    fun files(): FilesCommand
 
     fun syncTime()
 
@@ -65,4 +65,7 @@ interface AccurevClient {
     }
 
     fun getFile(stream: String, path: String, transaction: String = "highest"): String
+
+    fun fileExists(name: String, stream: String): Boolean
+    fun getFiles(stream: String): AccurevFiles
 }

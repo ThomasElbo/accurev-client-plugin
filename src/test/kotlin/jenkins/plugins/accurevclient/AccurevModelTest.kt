@@ -1,24 +1,8 @@
 package jenkins.plugins.accurevclient
 
-import ch.tutteli.atrium.api.cc.en_UK.hasSize
-import ch.tutteli.atrium.api.cc.en_UK.isFalse
-import ch.tutteli.atrium.api.cc.en_UK.isNotNull
-import ch.tutteli.atrium.api.cc.en_UK.isNull
-import ch.tutteli.atrium.api.cc.en_UK.isTrue
-import ch.tutteli.atrium.api.cc.en_UK.it
-import ch.tutteli.atrium.api.cc.en_UK.property
-import ch.tutteli.atrium.api.cc.en_UK.toBe
+import ch.tutteli.atrium.api.cc.en_UK.*
 import ch.tutteli.atrium.verbs.expect.expect
-import jenkins.plugins.accurevclient.model.AccurevDepots
-import jenkins.plugins.accurevclient.model.AccurevInfo
-import jenkins.plugins.accurevclient.model.AccurevStream
-import jenkins.plugins.accurevclient.model.AccurevStreamType
-import jenkins.plugins.accurevclient.model.AccurevStreams
-import jenkins.plugins.accurevclient.model.AccurevTransactionVersion
-import jenkins.plugins.accurevclient.model.AccurevTransactions
-import jenkins.plugins.accurevclient.model.AccurevUpdate
-import jenkins.plugins.accurevclient.model.AccurevWorkspaces
-import jenkins.plugins.accurevclient.model.TransactionType
+import jenkins.plugins.accurevclient.model.*
 import jenkins.plugins.accurevclient.utils.TimestampAdapter
 import jenkins.plugins.accurevclient.utils.unmarshal
 import org.junit.Test
@@ -169,6 +153,30 @@ class AccurevModelTest {
                 property(it::host).toBe("joseph-laptop")
                 property(it::loggedIn).toBe(false)
                 property(it::loggedOut).toBe(true)
+            }
+        }
+    }
+
+    @Test fun filesModel() {
+        val input = this.javaClass.getResourceAsStream("files.xml")
+
+        input.use { xml ->
+            val output = xml.unmarshal() as AccurevFiles
+            println(output)
+            expect(output.files[0]) {
+                property(it::status).toBe("(overlap)(member)")
+                property(it::location).contains("Jenkinsfile")
+                property(it::dir).toBe(false)
+                property(it::executable).toBe(false)
+                property(it::id).toBe(3)
+                property(it::elemType).toBe(AccurevFileType.Text)
+                property(it::size).toBe(248)
+                property(it::modTime).toBe("1559907875")
+                property(it::hierType).toBe("parallel")
+                property(it::virtual).toBe("5\\2")
+                property(it::namedVersion).toBe("TestStream\\2")
+                property(it::real).toBe("6\\2")
+
             }
         }
     }

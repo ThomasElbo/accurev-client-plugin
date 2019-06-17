@@ -9,17 +9,25 @@ import hudson.Launcher.LocalLauncher
 import hudson.model.TaskListener
 import hudson.util.ArgumentListBuilder
 import hudson.util.Secret
-import jenkins.plugins.accurevclient.commands.*
+import jenkins.plugins.accurevclient.commands.LoginCommand
+import jenkins.plugins.accurevclient.commands.UpdateCommand
+import jenkins.plugins.accurevclient.commands.PopulateCommand
+import jenkins.plugins.accurevclient.commands.FilesCommand
+import jenkins.plugins.accurevclient.commands.HistCommand
 import jenkins.plugins.accurevclient.model.*
+
 import jenkins.plugins.accurevclient.utils.defaultCharset
 import jenkins.plugins.accurevclient.utils.isNotEmpty
 import jenkins.plugins.accurevclient.utils.rootPath
 import jenkins.plugins.accurevclient.utils.unmarshal
-import java.io.*
-import java.nio.file.Paths
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.IOException
+import java.io.UnsupportedEncodingException
 import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
+
 
 class AccurevCliAPI(
         private val workspace: FilePath,
@@ -69,8 +77,35 @@ class AccurevCliAPI(
         }
     }
 
-    override fun filesFind(): FilesCommand {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+    override fun files(): FilesCommand {
+        return object : FilesCommand {
+            private val args = accurev("files", true)
+
+            override fun stream(stream: String): FilesCommand {
+                args.add("-s", stream)
+                return this
+            }
+
+            override fun overwrite(overwrite: Boolean): FilesCommand {
+                if(overwrite) args.add("-O")
+                return this
+            }
+
+            override fun ignore(files: Set<String>): FilesCommand {
+                // for String in set, add param --ignore=""
+                return this
+            }
+
+            override fun addExcluded(addExcluded: Boolean): FilesCommand {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun execute() {
+                launchCommand(args)
+            }
+
+        }
     }
 
     override fun populate(): PopulateCommand {
@@ -219,6 +254,22 @@ class AccurevCliAPI(
         return content
     }
 
+    override fun getFiles(stream: String) : AccurevFiles {
+        val key = if(stream.isNotBlank()) "$server:$:$stream" else server
+        return cachedAccurevFiles[key, Callable {
+            with(accurev("files", true)) {
+                if(stream.isNotBlank()) add ("-s", stream)
+                return@Callable launch().unmarshal() as AccurevFiles
+            }
+        }] ?: AccurevFiles()
+    }
+
+    override fun fileExists(name: String, stream: String) : Boolean {
+        val accurevFiles = getFiles(stream)
+        if(accurevFiles.files.isEmpty()) return false
+        return accurevFiles.files.contains(AccurevFile(name))
+    }
+
     override fun fetchDepot(depot: String): AccurevDepot? {
         val depots = getDepots()
         return depots.map[depot]
@@ -251,7 +302,6 @@ class AccurevCliAPI(
         } ] ?: AccurevStreams()
     }
 
-    @JvmOverloads
     override fun fetchStreamTransactionHistory(stream: String, timeSpecLower: String, timeSpecUpper: String) : AccurevTransactions {
         with(accurev("hist", true)) {
             val accurevTransactions = add("-t", "$timeSpecLower-$timeSpecUpper", "-s", stream).launch().unmarshal() as AccurevTransactions // Range
@@ -389,6 +439,7 @@ class AccurevCliAPI(
         @Transient private val cachedAccurevDepots: Cache<String, AccurevDepots> = Cache(3, TimeUnit.HOURS)
         @Transient private val cachedAccurevWorkspaces: Cache<String, AccurevWorkspaces> = Cache(3, TimeUnit.HOURS)
         @Transient private val cachedAccurevReferenceTrees: Cache<String, AccurevReferenceTrees> = Cache(3, TimeUnit.HOURS)
+        @Transient private val cachedAccurevFiles: Cache<String, AccurevFiles> = Cache(3, TimeUnit.HOURS)
     }
 
     private fun ArgumentListBuilder.launch(): String = this@AccurevCliAPI.launchCommand(this)

@@ -10,6 +10,4 @@ interface FilesCommand : AccurevCommand {
     fun ignore (files: Set<String>) : FilesCommand
 
     fun addExcluded (addExcluded : Boolean) : FilesCommand
-
-    fun findFiles (files: Set<String>) : FilesCommand
 }

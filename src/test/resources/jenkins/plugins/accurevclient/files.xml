@@ -1,45 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AcResponse
         Command="stat"
-        Directory="C:/Users/josep/accurev/ws/accurev"
-        TaskId="1092">
+        Directory="C:/Users/TMEL"
+        TaskId="1031">
     <element
-            location=".\doubleDAMN"
-            dir="no"
-            executable="no"
-            id="5"
-            elemType="text"
-            size="0"
-            modTime="1512930582"
-            hierType="parallel"
-            Virtual="2\2"
-            namedVersion="accurev_josp\2"
-            Real="2\2"
-            status="(defunct)(kept)(member)"/>
-    <element
-            location=".\bud"
+            location="\.\Jenkinsfile"
             dir="no"
             executable="no"
             id="3"
             elemType="text"
-            size="5"
-            modTime="1512907631"
+            size="248"
+            modTime="1559907875"
             hierType="parallel"
-            Virtual="3\3"
-            namedVersion="other_stream\3"
-            Real="2\3"
-            status="(backed)"/>
+            Virtual="5\2"
+            namedVersion="TestStream\2"
+            Real="6\2"
+            status="(overlap)(member)"/>
     <element
-            location=".\Jenkinsfile"
+            location="\.\file.txt"
             dir="no"
             executable="no"
             id="2"
             elemType="text"
-            size="120"
-            modTime="1512169390"
+            size="11"
+            modTime="1560427735"
             hierType="parallel"
-            Virtual="1\1"
-            namedVersion="accurev\1"
-            Real="2\2"
+            Virtual="1\59"
+            namedVersion="QWEELALKNC\59"
+            Real="3\58"
             status="(backed)"/>
 </AcResponse>

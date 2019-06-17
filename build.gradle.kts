@@ -2,18 +2,18 @@ import org.jenkinsci.gradle.plugins.jpi.JpiDeveloper
 import org.jenkinsci.gradle.plugins.jpi.JpiLicense
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val jvmVersion: Any? by project
-val jacocoVersion: Any? by project
-val ktlintVersion: Any? by project
-val jenkinsCoreVersion: Any? by project
-val jenkinsTestHarnessVersion: Any? by project
-val jenkinsCredentialsPluginVersion: Any? by project
-val sezpozVersion: Any? by project
-val atriumVersion: Any? by project
+val jvmVersion by project
+val jacocoVersion by project
+val ktlintVersion by project
+val jenkinsCoreVersion by project
+val jenkinsTestHarnessVersion by project
+val jenkinsCredentialsPluginVersion by project
+val sezpozVersion by project
+val atriumVersion by project
 
 plugins {
-    kotlin("jvm") version "1.2.51"
-    kotlin("kapt") version "1.2.51"
+    kotlin("jvm") version "1.2.20"
+    kotlin("kapt") version "1.2.20"
     id("org.jenkins-ci.jpi") version "0.25.0"
     id("org.jetbrains.dokka") version "0.9.15"
     id("com.diffplug.gradle.spotless") version "3.7.0"
@@ -98,7 +98,7 @@ tasks {
 }
 
 task<Wrapper>("wrapper") {
-    gradleVersion = "4.9"
+    gradleVersion = "4.3.1"
     distributionType = Wrapper.DistributionType.ALL
 }
 
