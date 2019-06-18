@@ -69,38 +69,38 @@ class AccurevModelTest {
     }
 
     @Test fun transactionModel() {
-        val input = this.javaClass.getResourceAsStream("hist.xml")
+        val input = this.javaClass.getResourceAsStream("transaction.xml")
 
         input.use { xml ->
             val output = xml.unmarshal() as AccurevTransactions
             println(output)
-            expect(output.transactions[0]) {
-                property(it::comment).toBe("c")
-                property(it::id).toBe(13)
-                property(it::type).toBe(TransactionType.Promote)
-                property(it::user).toBe("josp")
-                property(it::time).toBe(timestampAdapter.unmarshal(1512907647))
-                property(it::version).isNotNull { toBe(AccurevTransactionVersion("bud", 3)) }
+            expect(output.transactions[1]) {
+                property(it::comment).toBe("Test double keep")
+                property(it::id).toBe(264)
+                property(it::type).toBe(TransactionType.Keep)
+                property(it::user).toBe("TMEL_CLIENT")
+                property(it::time).toBe(timestampAdapter.unmarshal(1560839707))
+                property(it::version).isNotNull{this.hasSize(2)}
                 property(it::stream).isNull()
-            }
-            expect(output.transactions[3]) {
-                property(it::comment).toBe("")
-                property(it::id).toBe(6)
-                property(it::type).toBe(TransactionType.MakeStream)
-                property(it::user).toBe("josp")
-                property(it::time).toBe(timestampAdapter.unmarshal(1512907076))
-                property(it::version).isNull()
-                property(it::stream).isNotNull { toBe(AccurevStream(
-                    "other_stream",
-                    "accurev",
-                    3,
-                    "accurev",
-                    1,
-                    false,
-                    AccurevStreamType.Normal,
-                    Date(0),
-                    Date(0)
-                )) }
+
+//            expect(output.transactions[3]) {
+//                property(it::comment).toBe("")
+//                property(it::id).toBe(6)
+//                property(it::type).toBe(TransactionType.MakeStream)
+//                property(it::user).toBe("josp")
+//                property(it::time).toBe(timestampAdapter.unmarshal(1512907076))
+//                property(it::version).isNull()
+//                property(it::stream).isNotNull { toBe(AccurevStream(
+//                    "other_stream",
+//                    "accurev",
+//                    3,
+//                    "accurev",
+//                    1,
+//                    false,
+//                    AccurevStreamType.Normal,
+//                    Date(0),
+//                    Date(0)
+//                )) }
             }
         }
     }

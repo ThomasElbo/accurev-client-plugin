@@ -35,10 +35,19 @@ data class AccurevTransaction(
     @field:XmlElement
     val comment: String = "",
     @field:XmlElement
-    val version: AccurevTransactionVersion? = null,
+    val version: MutableList<AccurevTransactionVersion>? = null,
     @field:XmlElement
     var stream: String? = null
-)
+) {
+    fun affectedPaths() : List<String> {
+        if(version != null ) {
+            val paths = mutableListOf<String>()
+            version.forEach { v -> paths.add(v.path) }
+            return paths
+        }
+        return emptyList()
+    }
+}
 
 @XmlAccessorType(XmlAccessType.FIELD)
 data class AccurevTransactionVersion(

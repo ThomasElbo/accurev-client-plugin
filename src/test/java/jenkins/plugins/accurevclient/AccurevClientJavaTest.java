@@ -4,11 +4,9 @@ import hudson.EnvVars;
 import hudson.model.FreeStyleProject;
 import hudson.model.TaskListener;
 import hudson.util.Secret;
-import jenkins.plugins.accurevclient.model.AccurevStream;
-import jenkins.plugins.accurevclient.model.AccurevStreams;
-import jenkins.plugins.accurevclient.model.AccurevTransaction;
-import jenkins.plugins.accurevclient.model.AccurevTransactions;
+import jenkins.plugins.accurevclient.model.*;
 import org.apache.commons.lang.StringUtils;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -112,6 +110,46 @@ public class AccurevClientJavaTest {
         Collection<AccurevTransaction> as = client.getUpdatesFromAncestors("DummyProj", "LowestStream", client.fetchTransaction("LowestStream").getId());
 
         for(AccurevTransaction at : as) System.out.println(at.getStream() + ", " + at.getComment());
+    }
+
+    @Test public void testGetFiles() throws Exception {
+        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "TMEL_SERVER2016.wassts.org:5050";
+        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "TMEL";
+        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "Widex123";
+        assumeTrue("Can only run test with proper test setup",
+                AccurevTestUtils.checkCommandExist("accurev") &&
+                        StringUtils.isNotBlank(url) &&
+                        StringUtils.isNotBlank(username) &&
+                        StringUtils.isNotEmpty(password)
+        );
+        FreeStyleProject project = rule.createFreeStyleProject();
+        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
+                .at(project.getBuildDir()).on(url);
+        AccurevClient client = accurev.getClient();
+        client.login().username(username).password(Secret.fromString(password)).execute();
+
+        AccurevFiles files = client.getFiles("TestStream");
+        files.getFiles().size();
+    }
+
+    @Test public void testFindFile() throws Exception {
+        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "TMEL_SERVER2016.wassts.org:5050";
+        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "TMEL";
+        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "Widex123";
+        assumeTrue("Can only run test with proper test setup",
+                AccurevTestUtils.checkCommandExist("accurev") &&
+                        StringUtils.isNotBlank(url) &&
+                        StringUtils.isNotBlank(username) &&
+                        StringUtils.isNotEmpty(password)
+        );
+        FreeStyleProject project = rule.createFreeStyleProject();
+        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
+                .at(project.getBuildDir()).on(url);
+        AccurevClient client = accurev.getClient();
+        client.login().username(username).password(Secret.fromString(password)).execute();
+
+        Assert.assertTrue(client.fileExists("Jenkinsfile", "TestStream"));
+
     }
 
 }

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AcResponse
+        Command="hist"
+        TaskId="1343">
+    <transaction
+            id="263"
+            type="keep"
+            time="1560839680"
+            user="TMEL_CLIENT">
+        <comment>merged, re-based  from 3/48 to 3/60</comment>
+        <version
+                path="\.\file.txt"
+                eid="2"
+                virtual="6/2"
+                real="6/2"
+                virtualNamedVersion="TestStream_TMEL_CLIENT/2"
+                realNamedVersion="TestStream_TMEL_CLIENT/2"
+                ancestor="3/60"
+                ancestorNamedVersion="QWEELALKNC_TMEL_CLIENT/60"
+                elem_type="text"
+                dir="no"/>
+    </transaction>
+    <transaction
+            id="264"
+            type="keep"
+            time="1560839707"
+            user="TMEL_CLIENT">
+        <comment>Test double keep</comment>
+        <version
+                path="\.\file.txt"
+                eid="2"
+                virtual="6/3"
+                real="6/3"
+                virtualNamedVersion="TestStream_TMEL_CLIENT/3"
+                realNamedVersion="TestStream_TMEL_CLIENT/3"
+                ancestor="6/2"
+                ancestorNamedVersion="TestStream_TMEL_CLIENT/2"
+                elem_type="text"
+                dir="no"/>
+        <version
+                path="\.\Jenkinsfile"
+                eid="3"
+                virtual="6/3"
+                real="6/3"
+                virtualNamedVersion="TestStream_TMEL_CLIENT/3"
+                realNamedVersion="TestStream_TMEL_CLIENT/3"
+                ancestor="6/2"
+                ancestorNamedVersion="TestStream_TMEL_CLIENT/2"
+                elem_type="text"
+                dir="no"/>
+    </transaction>
+    <streams>
+        <stream
+                id="6"
+                name="TestStream_TMEL_CLIENT"
+                type="workspace"/>
+    </streams>
+</AcResponse>
