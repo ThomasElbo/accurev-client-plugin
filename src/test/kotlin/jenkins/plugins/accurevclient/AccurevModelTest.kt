@@ -82,25 +82,6 @@ class AccurevModelTest {
                 property(it::time).toBe(timestampAdapter.unmarshal(1560839707))
                 property(it::version).isNotNull{this.hasSize(2)}
                 property(it::stream).isNull()
-
-//            expect(output.transactions[3]) {
-//                property(it::comment).toBe("")
-//                property(it::id).toBe(6)
-//                property(it::type).toBe(TransactionType.MakeStream)
-//                property(it::user).toBe("josp")
-//                property(it::time).toBe(timestampAdapter.unmarshal(1512907076))
-//                property(it::version).isNull()
-//                property(it::stream).isNotNull { toBe(AccurevStream(
-//                    "other_stream",
-//                    "accurev",
-//                    3,
-//                    "accurev",
-//                    1,
-//                    false,
-//                    AccurevStreamType.Normal,
-//                    Date(0),
-//                    Date(0)
-//                )) }
             }
         }
     }
