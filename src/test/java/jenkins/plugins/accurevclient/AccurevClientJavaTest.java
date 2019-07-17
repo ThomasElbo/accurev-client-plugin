@@ -20,9 +20,9 @@ public class AccurevClientJavaTest {
     @Rule public JenkinsRule rule = new JenkinsRule();
 
     @Test public void loginCommand() throws Exception {
-        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "TMEL_SERVER2016.wassts.org:5050";
-        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "TMEL";
-        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "Widex123";
+        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
+        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "a";
+        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "1";
         assumeTrue("Can only run test with proper test setup",
         AccurevTestUtils.checkCommandExist("accurev") &&
                 StringUtils.isNotBlank(url) &&
@@ -37,9 +37,9 @@ public class AccurevClientJavaTest {
     }
 
     @Test public void fetchLatestTransaction() throws Exception {
-        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "TMEL_SERVER2016.wassts.org:5050";
-        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "TMEL";
-        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "Widex123";
+        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
+        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "a";
+        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "1";
         assumeTrue("Can only run test with proper test setup",
                 AccurevTestUtils.checkCommandExist("accurev") &&
                         StringUtils.isNotBlank(url) &&
@@ -59,9 +59,9 @@ public class AccurevClientJavaTest {
     }
 
     @Test public void fetchStream() throws Exception {
-        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "TMEL_SERVER2016.wassts.org:5050";
-        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "TMEL";
-        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "Widex123";
+        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
+        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "a";
+        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "1";
         assumeTrue("Can only run test with proper test setup",
                 AccurevTestUtils.checkCommandExist("accurev") &&
                         StringUtils.isNotBlank(url) &&
@@ -92,9 +92,9 @@ public class AccurevClientJavaTest {
     }
 
     @Test public void getUpdatedParents() throws Exception {
-        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "TMEL_SERVER2016.wassts.org:5050";
-        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "TMEL";
-        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "Widex123";
+        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
+        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "a";
+        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "1";
         assumeTrue("Can only run test with proper test setup",
                 AccurevTestUtils.checkCommandExist("accurev") &&
                         StringUtils.isNotBlank(url) &&
@@ -113,9 +113,9 @@ public class AccurevClientJavaTest {
     }
 
     @Test public void testGetFiles() throws Exception {
-        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "TMEL_SERVER2016.wassts.org:5050";
-        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "TMEL";
-        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "Widex123";
+        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
+        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "a";
+        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "1";
         assumeTrue("Can only run test with proper test setup",
                 AccurevTestUtils.checkCommandExist("accurev") &&
                         StringUtils.isNotBlank(url) &&
@@ -133,9 +133,9 @@ public class AccurevClientJavaTest {
     }
 
     @Test public void testFindFile() throws Exception {
-        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "TMEL_SERVER2016.wassts.org:5050";
-        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "TMEL";
-        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "Widex123";
+        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
+        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "a";
+        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "1";
         assumeTrue("Can only run test with proper test setup",
                 AccurevTestUtils.checkCommandExist("accurev") &&
                         StringUtils.isNotBlank(url) &&

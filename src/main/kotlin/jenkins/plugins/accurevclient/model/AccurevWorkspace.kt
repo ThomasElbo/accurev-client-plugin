@@ -1,6 +1,7 @@
 package jenkins.plugins.accurevclient.model
 
 import jenkins.plugins.accurevclient.utils.TimestampAdapter
+import java.io.Serializable
 import java.util.Date
 import javax.xml.bind.Unmarshaller
 import javax.xml.bind.annotation.XmlAccessType
@@ -15,7 +16,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter
 data class AccurevWorkspaces(
     @field:XmlElement(name = "Element")
     val list: MutableList<AccurevWorkspace> = mutableListOf()
-) {
+) : Serializable {
     @Transient lateinit var map: Map<String, AccurevWorkspace>
 
     @Suppress("unused", "UNUSED_PARAMETER")
@@ -43,6 +44,6 @@ data class AccurevWorkspace(
     @field:XmlJavaTypeAdapter(TimestampAdapter::class)
     @field:XmlAttribute(name = "fileModTime")
     val lastModified: Date = Date(0)
-) {
+) : Serializable {
     @Transient var stream: AccurevStream? = null
 }

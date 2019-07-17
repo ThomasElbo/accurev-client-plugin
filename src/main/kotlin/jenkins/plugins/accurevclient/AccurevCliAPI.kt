@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 
 
 class AccurevCliAPI(
-        private val workspace: FilePath,
+        @Transient private val workspace: FilePath,
         private val environment: EnvVars = EnvVars(),
         val accurevExe: String,
         val server: String,
@@ -330,7 +330,7 @@ class AccurevCliAPI(
         //updates.add(fetchTransaction(s!!.name))
 
         while( s != null ){
-            var listOfTransactions = fetchStreamTransactionHistory(s.name, timeSpec.toString())
+            var listOfTransactions = fetchStreamTransactionHistory(s.name, (timeSpec+1).toString())
 
             if(!listOfTransactions.transactions.isEmpty()) {
                 listOfTransactions.transactions.forEach { at -> if(at.id > ts) updates.add(at) }
