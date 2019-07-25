@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                bat 'gradlew hpi'
+                bat 'gradlew jpi'
             }
         }
         stage ('Deploy') {
