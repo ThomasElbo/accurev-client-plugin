@@ -4,8 +4,6 @@ import org.jenkinsci.gradle.plugins.jpi.JpiLicense
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jfrog.gradle.plugin.artifactory.dsl.PublisherConfig
 
-val sezpozVersion by project
-val atriumVersion by project
 val jvmVersion: Any? by project
 val jacocoVersion: Any? by project
 val ktlintVersion: Any? by project
