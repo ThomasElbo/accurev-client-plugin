@@ -1,22 +1,28 @@
+import groovy.lang.GroovyObject
 import org.jenkinsci.gradle.plugins.jpi.JpiDeveloper
 import org.jenkinsci.gradle.plugins.jpi.JpiLicense
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jfrog.gradle.plugin.artifactory.dsl.PublisherConfig
 
-val jvmVersion by project
-val jacocoVersion by project
-val ktlintVersion by project
-val jenkinsCoreVersion by project
-val jenkinsTestHarnessVersion by project
-val jenkinsCredentialsPluginVersion by project
 val sezpozVersion by project
 val atriumVersion by project
+val jvmVersion: Any? by project
+val jacocoVersion: Any? by project
+val ktlintVersion: Any? by project
+val jenkinsCoreVersion: Any? by project
+val jenkinsTestHarnessVersion: Any? by project
+val jenkinsCredentialsPluginVersion: Any? by project
+val sezpozVersion: Any? by project
+val atriumVersion: Any? by project
 
 plugins {
     kotlin("jvm") version "1.2.20"
     kotlin("kapt") version "1.2.20"
-    id("org.jenkins-ci.jpi") version "0.25.0"
-    id("org.jetbrains.dokka") version "0.9.15"
+    id("org.jenkins-ci.jpi") version "0.28.1"
+    id("org.jetbrains.dokka") version "0.9.18"
     id("com.diffplug.gradle.spotless") version "3.7.0"
+    id("com.jfrog.artifactory") version "4.9.8"
+    `maven-publish`
     jacoco
 	java
 }
@@ -34,12 +40,16 @@ dependencies {
     jenkinsTest("org.jenkins-ci.main:jenkins-test-harness:$jenkinsTestHarnessVersion") { isTransitive = true }
     jenkinsPlugins(group = "org.jenkins-ci.plugins", name =  "credentials", version = "2.1.18")
     jenkinsPlugins(group = "org.jenkins-ci.plugins", name = "credentials-binding", version = "1.18")
-
+    compile("org.jfrog.buildinfo:build-info-extractor-gradle:latest.release")
     kapt("net.java.sezpoz:sezpoz:$sezpozVersion")
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51")
+
 }
 
 jenkinsPlugin {
+
+    coreVersion = "2.74"
+
     displayName = "Accurev Client Plugin"
     shortName = "accurev-client"
     gitHubUrl = "https://github.com/casz/accurev-client-plugin"
@@ -84,6 +94,45 @@ java {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
+
+
+artifactory {
+    setContextUrl("http://localhost:8081/artifactory")
+    publish(delegateClosureOf<PublisherConfig> {
+        repository(delegateClosureOf<GroovyObject> {
+            setProperty("repoKey", "generic-local")
+            setProperty("username", "admin")
+            setProperty("password", "artifactory")
+            setProperty("maven", true)
+        })
+        defaults(delegateClosureOf<GroovyObject> {
+            invokeMethod("publications", "mavenJava")
+            setProperty("publishArtifacts", true)
+            setProperty("publishPom", true)
+        })
+    })
+}
+
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            groupId = "jenkins-plugins"
+            artifactId = "accurev-client"
+            version = "1.0.0-SNAPSHOT"
+
+            artifact("$buildDir/libs/accurev-client.hpi")
+
+            pom {
+                withXml {
+                  
+                }
+            }
+        }
+    }
+}
+
+
 tasks {
     withType<JacocoReport> {
         reports {
@@ -98,7 +147,7 @@ tasks {
 }
 
 task<Wrapper>("wrapper") {
-    gradleVersion = "4.3.1"
+    gradleVersion = "4.8.1"
     distributionType = Wrapper.DistributionType.ALL
 }
 
