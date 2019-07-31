@@ -1,0 +1,15 @@
+version: "3.7"
+services:
+  accurev:
+    image: accurev
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    ports:
+      - "5050:5050"
+    healthcheck:
+      test: ./accurev/bin/accurev info
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 1m

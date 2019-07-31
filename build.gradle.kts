@@ -41,7 +41,8 @@ dependencies {
     compile("org.jfrog.buildinfo:build-info-extractor-gradle:latest.release")
     kapt("net.java.sezpoz:sezpoz:$sezpozVersion")
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51")
-
+    compile("com.palantir.docker.compose:docker-compose-rule-junit4:0.36.3-rc1")
+    //compile("com.google.guava:guava:27.0.1-jre")
 }
 
 jenkinsPlugin {
@@ -163,6 +164,8 @@ configurations.all { exclude(module = "junit-dep") }
 buildscript {
     repositories {
         maven(url = "https://repo.jenkins-ci.org/public/")
+        maven(url = "https://dl.bintray.com/palantir/releases")
+        maven(url = "https://mvnrepository.com/artifact/com.google.guava/guava")
         jcenter()
     }
 }
