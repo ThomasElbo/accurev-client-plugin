@@ -9,11 +9,7 @@ import hudson.Launcher.LocalLauncher
 import hudson.model.TaskListener
 import hudson.util.ArgumentListBuilder
 import hudson.util.Secret
-import jenkins.plugins.accurevclient.commands.LoginCommand
-import jenkins.plugins.accurevclient.commands.UpdateCommand
-import jenkins.plugins.accurevclient.commands.PopulateCommand
-import jenkins.plugins.accurevclient.commands.FilesCommand
-import jenkins.plugins.accurevclient.commands.HistCommand
+import jenkins.plugins.accurevclient.commands.*
 import jenkins.plugins.accurevclient.model.*
 
 import jenkins.plugins.accurevclient.utils.defaultCharset
@@ -30,7 +26,7 @@ import java.util.concurrent.TimeUnit
 
 
 class AccurevCliAPI(
-        @Transient private val workspace: FilePath,
+        @Transient private val workspace: FilePath?,
         private val environment: EnvVars = EnvVars(),
         val accurevExe: String,
         val server: String,
@@ -41,13 +37,13 @@ class AccurevCliAPI(
     override var credentials: StandardUsernamePasswordCredentials? = null
 
     init {
-        environment.putIfAbsent("ACCUREV_HOME", workspace.rootPath())
+        environment.putIfAbsent("ACCUREV_HOME", workspace?.rootPath())
         launcher = LocalLauncher(if (AccurevClient.verbose) listener else TaskListener.NULL)
     }
 
-    fun accurev(cmd: String, xml: Boolean = false) = ArgumentListBuilder().apply {
+    fun accurev(cmd: String, xml: Boolean = false, appendServer: Boolean = true) = ArgumentListBuilder().apply {
         add(accurevExe, cmd)
-        if (server.isNotBlank()) add("-H", server)
+        if (server.isNotBlank() && appendServer) add("-H", server)
         if (xml) add("-fx")
     }
 
@@ -77,6 +73,129 @@ class AccurevCliAPI(
         }
     }
 
+    override fun stream(): StreamCommand {
+        return object : StreamCommand {
+            private val args = accurev("mkstream", xml = false)
+
+            override fun create(name: String, backingStream: String): StreamCommand {
+                args.add("-s", name)
+                args.add("-b", backingStream)
+                return this
+            }
+
+            override fun execute() {
+                launchCommand(args)
+            }
+
+        }
+    }
+
+    override fun depot(): DepotCommand {
+        return object : DepotCommand {
+            private val args = accurev("mkdepot", xml = false)
+
+            override fun create(name: String): DepotCommand {
+                args.add("-p", name)
+                return this
+            }
+
+            override fun execute() {
+                launchCommand(args)
+            }
+
+        }
+    }
+
+    override fun add(): AddCommand {
+        return object : AddCommand {
+            private val args = accurev("add", false)
+
+            override fun Add(files: List<String>): AddCommand {
+                files.forEach { args.add(it) }
+                return this
+            }
+
+            override fun Comment(comment: String): AddCommand {
+                args.add("-c", comment)
+                return this
+            }
+
+            override fun execute() {
+                launchCommand(args)
+            }
+
+        }
+    }
+
+    override fun keep(): KeepCommand {
+        return object : KeepCommand {
+            private val args = accurev("keep", false)
+
+            override fun comment(comment: String): KeepCommand {
+                args.add("-c", "\"$comment\"")
+                return this
+            }
+
+            override fun files(files: List<String>): KeepCommand {
+                files.forEach { args.add(it) }
+                return this
+            }
+
+            override fun recurse(): KeepCommand {
+                args.add("-m")
+                return this
+            }
+
+            override fun modified(): KeepCommand {
+                args.add("-m")
+                return this
+            }
+
+            override fun execute() {
+                launchCommand(args)
+            }
+
+        }
+    }
+
+    override fun promote() : PromoteCommand {
+        return object : PromoteCommand {
+            private val args = accurev("promote", false)
+
+            override fun files(files: List<String>) : PromoteCommand {
+                files.forEach { args.add(it) }
+                return this
+            }
+
+            override fun comment(comment: String): PromoteCommand {
+                args.add("-c", "\"$comment\"")
+                return this
+            }
+
+            override fun execute() {
+                launchCommand(args)
+            }
+
+        }
+    }
+
+    override fun workspace() : WorkspaceCommand {
+        return object : WorkspaceCommand {
+            private val args = accurev("mkws", false)
+            override fun create(name: String, backingStream: String) : WorkspaceCommand{
+                args.add("-w", name)
+                args.add("-b", backingStream)
+                args.add("-l", workspace.toString())
+                return this
+            }
+
+            override fun execute() {
+                launchCommand(args)
+            }
+
+        }
+
+    }
 
     override fun files(): FilesCommand {
         return object : FilesCommand {
@@ -110,7 +229,7 @@ class AccurevCliAPI(
 
     override fun populate(): PopulateCommand {
         return object : PopulateCommand {
-            val args = accurev("pop").add("-L", workspace.remote)
+            val args = accurev("pop").add("-L", workspace?.remote)
             var shallow = false
 
             override fun stream(stream: String): PopulateCommand {
@@ -188,8 +307,6 @@ class AccurevCliAPI(
             }
         }
     }
-
-
 
     override fun getWorkspaces(): AccurevWorkspaces {
         val accurevWorkspaces = cachedAccurevWorkspaces[server, Callable {
@@ -394,7 +511,7 @@ class AccurevCliAPI(
     @Throws(AccurevException::class, InterruptedException::class)
     fun launchCommand(
         args: ArgumentListBuilder,
-        ws: FilePath = workspace,
+        ws: FilePath? = workspace,
         env: EnvVars = environment,
         timeout: Int = TIMEOUT
     ): String {

@@ -7,8 +7,6 @@ import com.cloudbees.plugins.credentials.CredentialsMatchers
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
 import jenkins.plugins.accurevclient.commands.*
 import jenkins.plugins.accurevclient.model.*
-import java.io.InputStream
-import kotlin.properties.Delegates
 
 interface AccurevClient {
 
@@ -23,6 +21,18 @@ interface AccurevClient {
     fun populate(): PopulateCommand
 
     fun files(): FilesCommand
+
+    fun keep(): KeepCommand
+
+    fun promote(): PromoteCommand
+
+    fun stream(): StreamCommand
+
+    fun depot(): DepotCommand
+
+    fun workspace(): WorkspaceCommand
+
+    fun add(): AddCommand
 
     fun syncTime()
 
@@ -68,4 +78,6 @@ interface AccurevClient {
 
     fun fileExists(name: String, stream: String): Boolean
     fun getFiles(stream: String): AccurevFiles
+
+
 }
