@@ -15,14 +15,14 @@ import javax.xml.bind.JAXB
  *
  * @return [String]
  */
-fun FilePath.rootPath(): String = node().rootPath?.remote ?: parent.remote
+fun FilePath.rootPath(): String = node()?.rootPath?.remote ?: parent.remote
 
 /**
  * Returns [Node] from [FilePath] however if node is offline returns [Jenkins] node
  *
  * @return [Node]
  */
-fun FilePath.node(): Node = toComputer()?.node ?: Jenkins.getInstance()
+fun FilePath.node(): Node? = toComputer()?.node ?: Jenkins.getInstanceOrNull()?.getNode("master")
 
 /**
  * Converts [Secret] to [String] and checks that it is not empty
