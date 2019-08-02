@@ -278,10 +278,6 @@ class AccurevCliAPI(
         }
     }
 
-
-
-
-
     override fun update(): UpdateCommand {
         return object : UpdateCommand {
             val args = accurev("update", true)
@@ -305,6 +301,27 @@ class AccurevCliAPI(
             override fun execute() {
                 launchCommand(args)
             }
+        }
+    }
+
+    override fun changeWS(): ChangeWSCommand {
+        return object : ChangeWSCommand {
+            val args = accurev("chws", false)
+
+            override fun name(name : String): ChangeWSCommand {
+                args.add("-w", name)
+                return this
+            }
+
+            override fun location(location : String): ChangeWSCommand {
+                args.add("-l", location)
+                return this
+            }
+
+            override fun execute() {
+                launchCommand(args)
+            }
+
         }
     }
 

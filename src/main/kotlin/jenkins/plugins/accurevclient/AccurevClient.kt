@@ -34,6 +34,8 @@ interface AccurevClient {
 
     fun add(): AddCommand
 
+    fun changeWS() : ChangeWSCommand
+
     fun syncTime()
 
     fun getVersion(): String
@@ -77,6 +79,7 @@ interface AccurevClient {
     fun getFile(stream: String, path: String, transaction: String = "highest"): String
 
     fun fileExists(name: String, stream: String): Boolean
+
     fun getFiles(stream: String): AccurevFiles
 
 

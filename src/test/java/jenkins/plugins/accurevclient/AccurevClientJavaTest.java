@@ -17,12 +17,15 @@ import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assume.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -251,6 +254,46 @@ public class AccurevClientJavaTest {
         client.promote().files(files).comment("file to depotStream").execute();
 
         assertTrue(client.fileExists("file", streamName));
+    }
+    
+    @Test public void testChangeWorkspace() throws Exception {
+        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
+        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "accurev_user";
+        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "docker";
+        assumeTrue("Can only run test with proper test setup",
+                AccurevTestUtils.checkCommandExist("accurev") &&
+                        StringUtils.isNotBlank(url) &&
+                        StringUtils.isNotBlank(username) &&
+                        StringUtils.isNotEmpty(password)
+        );
+        FreeStyleProject project = rule.createFreeStyleProject();
+        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
+                .at(project.getBuildDir()).on(url);
+        AccurevClient client = accurev.getClient();
+
+        client.login().username(username).password(Secret.fromString(password)).execute();
+        assertTrue(client.getInfo().getLoggedIn());
+
+        String depotName = mkDepot(client);
+        String streamName = mkStream(depotName, client);
+
+        AccurevStreams streams = client.getChildStreams(depotName, streamName);
+
+        assertEquals(1, streams.getList().size());
+
+        String s = mkWorkspace(streamName, client);
+
+        assertTrue(client.getInfo().getInWorkspace());
+
+        File f = new File("newWS");
+        assertTrue(f.mkdir());
+
+        client.changeWS().name(s).location(f.getAbsolutePath()).execute();
+        assertFalse(client.getInfo().getInWorkspace());
+        assertEquals(client.getWorkspaces().getList().get(0).getStorage(), (f.getAbsolutePath().replace('\\', '/')));
+
+        Files.deleteIfExists(f.toPath());
+
     }
 
 
