@@ -38,7 +38,7 @@ dependencies {
     jenkinsTest("org.jenkins-ci.main:jenkins-test-harness:$jenkinsTestHarnessVersion") { isTransitive = true }
     jenkinsPlugins(group = "org.jenkins-ci.plugins", name =  "credentials", version = "2.1.18")
     jenkinsPlugins(group = "org.jenkins-ci.plugins", name = "credentials-binding", version = "1.18")
-    compile("org.jfrog.buildinfo:build-info-extractor-gradle:latest.release")
+    testCompile("org.jfrog.buildinfo:build-info-extractor-gradle:latest.release")
     kapt("net.java.sezpoz:sezpoz:$sezpozVersion")
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51")
     compile("com.palantir.docker.compose:docker-compose-rule-junit4:0.36.3-rc1")
@@ -96,7 +96,7 @@ java {
 
 
 artifactory {
-    setContextUrl("http://localhost:8081/artifactory")
+    setContextUrl("http://localhost:8082/artifactory")
     publish(delegateClosureOf<PublisherConfig> {
         repository(delegateClosureOf<GroovyObject> {
             setProperty("repoKey", "generic-local")
