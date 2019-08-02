@@ -1,5 +1,6 @@
 package jenkins.plugins.accurevclient
 
+import java.sql.Timestamp
 import java.util.LinkedHashMap
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutionException
@@ -11,15 +12,25 @@ class Cache<K, V> @JvmOverloads constructor(duration: Int, unit: TimeUnit, maxEn
 
     private val expireAfterNanos: Long = unit.toNanos(duration.toLong())
 
+    private val lastUpdate: Long = Timestamp(System.currentTimeMillis()).nanos.toLong()
+
+
     init {
         this.entries = LimitedMap(maxEntries)
     }
 
     @Synchronized
     @Throws(ExecutionException::class)
-    operator fun get(key: K, callable: Callable<V>): V? {
+    operator fun get(key: K, callable: Callable<V>, client: AccurevClient? = null, types: Collection<String>? = emptyList()): V? {
         if (isExpired(key)) {
             doRemove(key)
+        }
+
+        if (!types!!.isEmpty()){
+            val result = client!!.hist().depot(key.toString()).timeSpec("$lastUpdate-now").execute()
+            if(result.equals(10)) {
+
+            }
         }
 
         if (entries.containsKey(key)) {

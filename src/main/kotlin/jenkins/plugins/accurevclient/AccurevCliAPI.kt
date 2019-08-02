@@ -331,7 +331,7 @@ class AccurevCliAPI(
                 add("-a", "wspaces")
                 return@Callable launch().unmarshal() as AccurevWorkspaces
             }
-        } ] ?: AccurevWorkspaces()
+        }, this ] ?: AccurevWorkspaces()
         val accurevStreams = getStreams().map
         accurevWorkspaces.list.forEach {
             accurevStreams[it.name]?.let { stream ->
@@ -347,7 +347,7 @@ class AccurevCliAPI(
                 add("refs")
                 return@Callable launch().unmarshal() as AccurevReferenceTrees
             }
-        } ] ?: AccurevReferenceTrees()
+        }, this ] ?: AccurevReferenceTrees()
         val accurevStreams = getStreams().map
         accurevReferenceTrees.list.forEach {
             accurevStreams[it.name]?.let { stream ->
@@ -363,7 +363,7 @@ class AccurevCliAPI(
                 add("depots")
                 return@Callable launch().unmarshal() as AccurevDepots
             }
-        } ] ?: AccurevDepots()
+        }, this ] ?: AccurevDepots()
     }
 
     override fun getStreams(depot: String): AccurevStreams {
@@ -374,7 +374,7 @@ class AccurevCliAPI(
                 add("streams")
                 return@Callable launch().unmarshal() as AccurevStreams
             }
-        } ] ?: AccurevStreams()
+        }, this ] ?: AccurevStreams()
     }
 
     override fun getFile(stream: String, path: String, transaction: String) : String {
@@ -395,7 +395,7 @@ class AccurevCliAPI(
                 if(stream.isNotBlank()) add ("-s", stream)
                 return@Callable launch().unmarshal() as AccurevFiles
             }
-        }] ?: AccurevFiles()
+        }, this] ?: AccurevFiles()
     }
 
     override fun fileExists(name: String, stream: String) : Boolean {
@@ -433,7 +433,7 @@ class AccurevCliAPI(
                 add("-R", "-s", stream, "streams")
                 return@Callable launch().unmarshal() as AccurevStreams
             }
-        } ] ?: AccurevStreams()
+        }, this,  listOf("chstream", "defcomp", "mkstream")] ?: AccurevStreams()
     }
 
     override fun fetchStreamTransactionHistory(stream: String, timeSpecLower: String, timeSpecUpper: String) : AccurevTransactions {
