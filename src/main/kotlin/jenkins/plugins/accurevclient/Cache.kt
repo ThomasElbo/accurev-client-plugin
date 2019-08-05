@@ -12,7 +12,7 @@ class Cache<K, V> @JvmOverloads constructor(duration: Int, unit: TimeUnit, maxEn
 
     private val expireAfterNanos: Long = unit.toNanos(duration.toLong())
 
-    private val lastUpdate: Long = Timestamp(System.currentTimeMillis()).nanos.toLong()
+    private var lastUpdate: Long = 1
 
 
     init {
@@ -26,10 +26,18 @@ class Cache<K, V> @JvmOverloads constructor(duration: Int, unit: TimeUnit, maxEn
             doRemove(key)
         }
 
+        val result: V
         if (!types!!.isEmpty()){
-            val result = client!!.hist().depot(key.toString()).timeSpec("$lastUpdate-now").execute()
-            if(result.equals(10)) {
-
+            val parts = key.toString().split(":")
+            val updates = client!!.fetchDepotTransactionHistory(parts[parts.size-1], lastUpdate.toString(), "now", types)
+            if(!updates.transactions.isEmpty()) {
+                try {
+                    lastUpdate = updates.transactions.last().id
+                    result = callable.call()
+                }catch (e: Exception) {
+                        throw ExecutionException("Cannot load value for key: " + key, e)
+                }
+                return doPut(key, result)
             }
         }
 
@@ -37,7 +45,7 @@ class Cache<K, V> @JvmOverloads constructor(duration: Int, unit: TimeUnit, maxEn
             return entries[key]?.value
         }
 
-        val result: V
+
         try {
             result = callable.call()
         } catch (e: Exception) {

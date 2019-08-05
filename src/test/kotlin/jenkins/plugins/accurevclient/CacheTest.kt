@@ -1,148 +1,79 @@
 package jenkins.plugins.accurevclient
 
-import hudson.util.ArgumentListBuilder
-import jline.console.completer.ArgumentCompleter
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
+import com.palantir.docker.compose.DockerComposeRule
+import hudson.EnvVars
+import hudson.model.TaskListener
+import hudson.util.Secret
+import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.hasProperty
+import org.junit.Assert.*
+import org.junit.Assume
+import org.junit.ClassRule
+import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.Callable
-import java.util.concurrent.TimeUnit
+import org.jvnet.hudson.test.JenkinsRule
+import org.hamcrest.CoreMatchers.`is` as Is
 
 class CacheTest {
 
-    @Test
-    fun testEmptyCache() {
-        val cache: Cache<String, CacheTest> = Cache(1, TimeUnit.MINUTES)
-        assertEquals(cache.size(), 0)
+    @Rule
+    @JvmField
+    val rule = JenkinsRule()
+
+    companion object {
+        @ClassRule @JvmField
+        var docker = DockerComposeRule.builder()
+                .file("src/docker/docker-compose.yml")
+                .build()
     }
 
-    @Test
-    fun testInitialCache() {
-        val cache: Cache<String, TestObject> = Cache(1, TimeUnit.MINUTES)
 
-        assertEquals(cache.size(), 0)
-
-        val items = cache["testKey", Callable {
-          with(argumentBuilder("CacheEntry1")) {
-              return@Callable launch()
-          }
-        }] ?: TestObject()
-
-        assertEquals(items.name, "CacheEntry1")
-        assertEquals(cache.size(), 1)
-    }
 
     @Test
-    fun testNoDuplicateEntries() {
-        val cache: Cache<String, TestObject> = Cache(1, TimeUnit.MINUTES)
+    fun testCacheServerValidation() {
 
-        assertEquals(cache.size(), 0)
+        val url = System.getenv("_ACCUREV_URL") ?: "localhost:5050"
+        val username = System.getenv("_ACCUREV_USERNAME") ?: "accurev_user"
+        val password = System.getenv("_ACCUREV_PASSWORD") ?: "docker"
+        Assume.assumeTrue("Can only run test with proper test setup",
+                "accurev".checkCommandExist() &&
+                        url.isNotBlank() &&
+                        username.isNotBlank() &&
+                        password.isNotEmpty()
+        )
 
-        val item1 = cache["testKey", Callable {
-            with(argumentBuilder("CacheEntry1")) {
-                return@Callable launch()
-            }
-        }] ?: TestObject()
+        val project = rule.createFreeStyleProject()
+        val accurev = Accurev.with(TaskListener.NULL, EnvVars())
+                .at(project.buildDir).on(url)
+        val client = accurev.client
 
-        assertEquals(item1.name, "CacheEntry1")
-        assertEquals(cache.size(), 1)
+        client.login().username(username).password(Secret.fromString(password)).execute()
+        assertTrue(client.getInfo().loggedIn)
 
-        val item2 = cache["testKey", Callable {
-            with(argumentBuilder("CacheEntry1")) {
-                return@Callable launch()
-            }
-        }] ?:  TestObject()
+        val create = MkFunctions(client)
 
-        assertEquals(item1.name, item2.name)
-        assertEquals(cache.size(), 1)
-    }
+        val depot = create.mkDepot()
+        val stream = create.mkStream(depot)
 
-    @Test
-    fun testItemNotInCache() {
-        val cache: Cache<String, TestObject> = Cache(1, TimeUnit.MINUTES)
 
-        assertEquals(cache.size(), 0)
+        var streams = client.getStreams(depot)
 
-        val item1 = cache["testKey", Callable {
-            with(argumentBuilder("CacheEntry1")) {
-                return@Callable launch()
-            }
-        }] ?: TestObject()
+        assertEquals(2, streams.list.size)
+        assertThat(streams.list, contains(
+                hasProperty("name", Is(depot)),
+                hasProperty("name", Is(stream))
+        ))
 
-        assertEquals(cache.size(), 1)
-        assertNotEquals(item1.name, "CacheEntry2")
+        val stream2 = create.mkStream(depot)
+        streams = client.getStreams(depot)
 
-        val item2 = cache["testKey2", Callable {
-            with(argumentBuilder("CacheEntry2")) {
-                return@Callable launch()
-            }
-        }] ?: TestObject()
-
-        assertEquals(item2.name, "CacheEntry2")
-        assertEquals(cache.size(), 2)
+        assertEquals(3, streams.list.size)
+        assertThat(streams.list, contains(
+                hasProperty("name", Is(depot)),
+                hasProperty("name", Is(stream)),
+                hasProperty("name", Is(stream2))
+        ))
 
     }
-
-    @Test
-    fun testReplaceKeyWhenFullCache() {
-        val cache: Cache<String, TestObject> = Cache(1, TimeUnit.MINUTES, 1)
-
-        assertEquals(0, cache.size())
-
-        val item1 = cache["testKey", Callable {
-            with(argumentBuilder("CacheEntry1")) {
-                return@Callable launch()
-            }
-        }] ?: TestObject()
-
-        assertEquals(cache.size(), 1)
-        assertEquals(item1.name, "CacheEntry1")
-
-        val item2 = cache["testKey1", Callable {
-            with(argumentBuilder("CacheEntry2")) {
-                return@Callable launch()
-            }
-        }] ?: TestObject()
-
-        assertEquals(cache.size(), 1)
-        assertEquals(item2.name, "CacheEntry2")
-    }
-
-    @Test
-    fun testClearCache() {
-        val cache: Cache<String, TestObject> = Cache(1, TimeUnit.MINUTES, 1)
-
-        assertEquals(0, cache.size())
-
-        val item1 = cache["testKey", Callable {
-            with(argumentBuilder("CacheEntry1")) {
-                return@Callable launch()
-            }
-        }] ?: TestObject()
-
-        assertEquals(1, cache.size())
-        assertEquals("CacheEntry1", item1.name)
-
-        cache.evictAll()
-
-        assertEquals(0, cache.size())
-    }
-
-    private fun argumentBuilder(cmd: String) = ArgumentListBuilder().apply {
-        add(cmd)
-    }
-
-    private fun ArgumentListBuilder.launch(): TestObject = this@CacheTest.emulateLaunchCommand(this)
-
-    private fun emulateLaunchCommand(args: ArgumentListBuilder): TestObject {
-        val list = args.toList()
-        val requestedKeys: MutableList<TestObject> = arrayListOf()
-        list.forEach{word -> requestedKeys.add(TestObject(word))}
-        return requestedKeys[0]
-    }
-
-    data class TestObject(
-            val name: String = ""
-    )
 
 }

@@ -374,7 +374,7 @@ class AccurevCliAPI(
                 add("streams")
                 return@Callable launch().unmarshal() as AccurevStreams
             }
-        }, this ] ?: AccurevStreams()
+        }, this, listOf("chstream", "defcomp", "mkstream")] ?: AccurevStreams()
     }
 
     override fun getFile(stream: String, path: String, transaction: String) : String {
@@ -441,6 +441,16 @@ class AccurevCliAPI(
             val accurevTransactions = add("-t", "$timeSpecLower-$timeSpecUpper", "-s", stream).launch().unmarshal() as AccurevTransactions // Range
             accurevTransactions.transactions.forEach { transaction -> transaction.stream = stream }
             return accurevTransactions
+        }
+    }
+
+    override fun fetchDepotTransactionHistory(depot: String, timeSpecLower: String, timeSpecUpper: String, types: Collection<String>) : AccurevTransactions {
+        with(accurev("hist", true)) {
+            add("-t", "$timeSpecLower-$timeSpecUpper", "-p", depot)
+            types.forEach{
+                add("-k", it)
+            }
+            return launch().unmarshal() as AccurevTransactions // Range
         }
     }
 
