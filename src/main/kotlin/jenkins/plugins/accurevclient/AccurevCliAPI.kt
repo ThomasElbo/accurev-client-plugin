@@ -436,6 +436,40 @@ class AccurevCliAPI(
         }, this,  listOf("chstream", "defcomp", "mkstream")] ?: AccurevStreams()
     }
 
+    override fun getNDepthChildStreams(depot: String, stream: String, depth: Long) : Collection<AccurevStream> {
+        val streams = getChildStreams(depot, stream)
+        val childStreams = mutableListOf<AccurevStream>()
+        if(depth == 1L) {
+            streams.list.forEach {
+                if(it.parent != null) {
+                    if (it.parent!!.name == stream){
+                        childStreams.add(it)
+                    }
+                }
+            }
+            return childStreams
+        }
+        var queue: MutableList<String> = mutableListOf(stream)
+
+        for(i in 1..depth ) {
+            val iterator = queue.iterator()
+            val temp = mutableListOf<AccurevStream>()
+            for(item in iterator) {
+                val stream = streams.list.firstOrNull{ x -> x.name == item}
+                if(stream != null) {
+                    if(stream.children.isNotEmpty()) {
+                        temp.addAll(stream!!.children)
+                        childStreams.addAll(stream!!.children)
+                    }
+                }
+            }
+
+            queue = mutableListOf()
+            for(item in temp) { queue.add(item.name) }
+        }
+        return childStreams.distinct()
+    }
+
     override fun fetchStreamTransactionHistory(stream: String, timeSpecLower: String, timeSpecUpper: String) : AccurevTransactions {
         with(accurev("hist", true)) {
             val accurevTransactions = add("-t", "$timeSpecLower-$timeSpecUpper", "-s", stream).launch().unmarshal() as AccurevTransactions // Range

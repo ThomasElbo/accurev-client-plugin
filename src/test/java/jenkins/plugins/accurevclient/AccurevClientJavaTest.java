@@ -10,6 +10,7 @@ import jenkins.plugins.accurevclient.model.AccurevStream;
 import jenkins.plugins.accurevclient.model.AccurevStreams;
 import jenkins.plugins.accurevclient.model.AccurevTransaction;
 import org.apache.commons.lang.StringUtils;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -24,10 +25,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.beans.HasProperty.hasProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assume.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
 
 public class AccurevClientJavaTest {
     @Rule public JenkinsRule rule = new JenkinsRule();
@@ -293,6 +298,99 @@ public class AccurevClientJavaTest {
         assertEquals(client.getWorkspaces().getList().get(0).getStorage(), (f.getAbsolutePath().replace('\\', '/')));
 
         Files.deleteIfExists(f.toPath());
+    }
+
+
+    @Test public void getNDepthChildStreams() throws Exception {
+        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
+        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "accurev_user";
+        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "docker";
+        assumeTrue("Can only run test with proper test setup",
+                AccurevTestUtils.checkCommandExist("accurev") &&
+                        StringUtils.isNotBlank(url) &&
+                        StringUtils.isNotBlank(username) &&
+                        StringUtils.isNotEmpty(password)
+        );
+        FreeStyleProject project = rule.createFreeStyleProject();
+        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
+                .at(project.getBuildDir()).on(url);
+        AccurevClient client = accurev.getClient();
+
+        client.login().username(username).password(Secret.fromString(password)).execute();
+        assertTrue(client.getInfo().getLoggedIn());
+
+        String depotName = mkDepot(client);
+        String streamD1 = mkStream(depotName, client);
+        String streamD2 = mkStream(streamD1, client);
+
+        /**
+         *  depotName
+         *      - streamD1
+         *          - streamD2
+         *              - streamD3
+         */
+        Collection<AccurevStream> streams = client.getNDepthChildStreams(depotName, depotName, 1L);
+
+
+        assertEquals(1, streams.size());
+        assertThat(streams, contains(
+                Matchers.hasProperty("name", is(streamD1))
+        ));
+
+        streams = client.getNDepthChildStreams(depotName, depotName, 2L);
+
+        assertEquals(2, streams.size());
+
+        assertThat(streams, containsInAnyOrder(
+                Matchers.hasProperty("name", is(streamD1)),
+                Matchers.hasProperty("name", is(streamD2))
+        ));
+
+        String streamD3 = mkStream(streamD2, client);
+
+        streams = client.getNDepthChildStreams(depotName, depotName, 3L);
+        assertEquals(3, streams.size());
+        assertThat(streams, containsInAnyOrder(
+                Matchers.hasProperty("name", is(streamD1)),
+                Matchers.hasProperty("name", is(streamD2)),
+                Matchers.hasProperty("name", is(streamD3))
+        ));
+
+        /**
+         *  depotName
+         *      - streamD1
+         *          - streamD2
+         *              - streamD3
+         *      - streamD11
+         */
+        String streamD11 = mkStream(depotName, client);
+
+        streams = client.getNDepthChildStreams(depotName, depotName, 1L);
+        assertEquals(2, streams.size());
+        assertThat(streams, containsInAnyOrder(
+                Matchers.hasProperty("name", is(streamD1)),
+                Matchers.hasProperty("name", is(streamD11))
+        ));
+        /**
+         *  depotName
+         *      - streamD1
+         *          - streamD2
+         *              - streamD3
+         *      - streamD11
+         *          - streamD22
+         */
+        String streamD22 = mkStream(streamD11, client);
+        streams = client.getNDepthChildStreams(depotName, depotName, 3L);
+        assertEquals(5, streams.size());
+        assertThat(streams, containsInAnyOrder(
+                Matchers.hasProperty("name", is(streamD1)),
+                Matchers.hasProperty("name", is(streamD2)),
+                Matchers.hasProperty("name", is(streamD3)),
+                Matchers.hasProperty("name", is(streamD11)),
+                Matchers.hasProperty("name", is(streamD22))
+        ));
+
+
 
     }
 

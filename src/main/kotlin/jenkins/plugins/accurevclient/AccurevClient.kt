@@ -83,4 +83,6 @@ interface AccurevClient {
     fun getFiles(stream: String): AccurevFiles
 
     fun fetchDepotTransactionHistory(depot: String, timeSpecLower: String, timeSpecUpper: String, types: Collection<String>) : AccurevTransactions
+
+    fun getNDepthChildStreams(depot: String, stream: String, depth: Long) : Collection<AccurevStream>
 }
