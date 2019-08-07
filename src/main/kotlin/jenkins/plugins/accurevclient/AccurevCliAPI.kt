@@ -501,7 +501,7 @@ class AccurevCliAPI(
         }
     }
 
-    override fun getUpdatesFromAncestors( depot: String, stream : String, timeSpec : Long ) : MutableCollection<AccurevTransaction>{
+    override fun getUpdatesFromAncestors( depot: String, stream : String, timeSpec : Long ) : MutableList<AccurevTransaction> {
         var s = this.fetchStream(depot, stream)
         var ts = timeSpec
         var updates: MutableCollection<AccurevTransaction> = mutableListOf()
@@ -523,7 +523,8 @@ class AccurevCliAPI(
             s = this.fetchStream(depot, s.parent?.name ?: "")
 
         }
-        return updates
+
+        return (updates.sortedByDescending { x -> x.id }).toMutableList()
     }
 
     override fun syncTime() {
