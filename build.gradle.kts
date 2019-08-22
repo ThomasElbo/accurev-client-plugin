@@ -131,7 +131,6 @@ publishing {
     }
 }
 
-
 tasks {
     withType<JacocoReport> {
         reports {
