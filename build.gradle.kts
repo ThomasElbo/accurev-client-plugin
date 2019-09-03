@@ -144,6 +144,8 @@ tasks {
     }
     withType<Test> {
         testLogging.showStandardStreams = true
+        testLogging.events("passed", "skipped", "failed")
+        testLogging.setExceptionFormat("full")
     }
 }
 
