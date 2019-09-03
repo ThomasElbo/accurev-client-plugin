@@ -2,7 +2,10 @@ language: java
 jdk:
   - openjdk8
 script:
-  - ./gradlew clean assemble check jacocoTestReport
+  - ./gradlew clean
+  - ./gradlew assemble
+  - ./gradlew check
+  - ./gradlew jacocoTestReport
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 before_cache:
