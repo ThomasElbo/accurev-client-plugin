@@ -170,3 +170,7 @@ buildscript {
         jcenter()
     }
 }
+
+configurations.all {
+    resolutionStrategy.force("com.google.guava:guava:27.0.1-jre" )
+}
