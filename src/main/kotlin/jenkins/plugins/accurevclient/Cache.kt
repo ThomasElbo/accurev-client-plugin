@@ -1,6 +1,5 @@
 package jenkins.plugins.accurevclient
 
-import java.sql.Timestamp
 import java.util.LinkedHashMap
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutionException
@@ -14,7 +13,6 @@ class Cache<K, V> @JvmOverloads constructor(duration: Int, unit: TimeUnit, maxEn
 
     private var lastUpdate: Long = 1
 
-
     init {
         this.entries = LimitedMap(maxEntries)
     }
@@ -27,14 +25,15 @@ class Cache<K, V> @JvmOverloads constructor(duration: Int, unit: TimeUnit, maxEn
         }
 
         val result: V
-        if (!types!!.isEmpty()){
-            val parts = key.toString().split(":")
-            val updates = client!!.fetchDepotTransactionHistory(parts[parts.size-1], lastUpdate.toString(), "now", types)
-            if(!updates.transactions.isEmpty()) {
+        val parts = key.toString().split(":")
+        if (!types!!.isEmpty() && parts.size > 2) {
+
+            val updates = client!!.fetchDepotTransactionHistory(parts[parts.size - 1], lastUpdate.toString(), "now", types)
+            if (!updates.transactions.isEmpty()) {
                 try {
                     lastUpdate = updates.transactions.last().id
                     result = callable.call()
-                }catch (e: Exception) {
+                } catch (e: Exception) {
                         throw ExecutionException("Cannot load value for key: " + key, e)
                 }
                 return doPut(key, result)
@@ -44,7 +43,6 @@ class Cache<K, V> @JvmOverloads constructor(duration: Int, unit: TimeUnit, maxEn
         if (entries.containsKey(key)) {
             return entries[key]?.value
         }
-
 
         try {
             result = callable.call()

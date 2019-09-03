@@ -1,6 +1,5 @@
 package jenkins.plugins.accurevclient
 
-
 import com.cloudbees.jenkins.plugins.sshcredentials.SSHUserPrivateKey
 import com.cloudbees.plugins.credentials.CredentialsMatcher
 import com.cloudbees.plugins.credentials.CredentialsMatchers
@@ -55,7 +54,7 @@ interface AccurevClient {
 
     fun add(): AddCommand
 
-    fun changeWS() : ChangeWSCommand
+    fun changeWS(): ChangeWSCommand
 
     fun syncTime()
 
@@ -79,9 +78,9 @@ interface AccurevClient {
 
     fun getChildStreams(depot: String, stream: String): AccurevStreams
 
-    fun fetchStreamTransactionHistory(stream: String, timeSpec: String, timeSpecUpper: String = "now") : AccurevTransactions
+    fun fetchStreamTransactionHistory(stream: String, timeSpec: String, timeSpecUpper: String = "now"): AccurevTransactions
 
-    fun getUpdatesFromAncestors( depot: String, stream : String, timeSpec : Long )  : MutableCollection<AccurevTransaction>
+    fun getUpdatesFromAncestors( depot: String, stream: String, timeSpec: Long ): MutableCollection<AccurevTransaction>
 
     fun getInfo(): AccurevInfo
 
@@ -103,7 +102,7 @@ interface AccurevClient {
 
     fun getFiles(stream: String): AccurevFiles
 
-    fun fetchDepotTransactionHistory(depot: String, timeSpecLower: String, timeSpecUpper: String, types: Collection<String>) : AccurevTransactions
+    fun fetchDepotTransactionHistory(depot: String, timeSpecLower: String, timeSpecUpper: String, types: Collection<String>): AccurevTransactions
 
-    fun getNDepthChildStreams(depot: String, stream: String, depth: Long) : Collection<AccurevStream>
+    fun getNDepthChildStreams(depot: String, stream: String, depth: Long): Collection<AccurevStream>
 }

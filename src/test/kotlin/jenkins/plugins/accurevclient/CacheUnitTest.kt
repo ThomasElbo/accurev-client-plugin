@@ -22,10 +22,10 @@ class CacheUnitTest {
         assertEquals(cache.size(), 0)
 
         val items = cache["testKey", Callable {
-          with(argumentBuilder("CacheEntry1")) {
-              return@Callable launch()
-          }
-        }] ?: TestObject()
+            with(argumentBuilder("CacheEntry1")) {
+                return@Callable launch()
+            }
+        } ] ?: TestObject()
 
         assertEquals(items.name, "CacheEntry1")
         assertEquals(cache.size(), 1)
@@ -41,7 +41,7 @@ class CacheUnitTest {
             with(argumentBuilder("CacheEntry1")) {
                 return@Callable launch()
             }
-        }] ?: TestObject()
+        } ] ?: TestObject()
 
         assertEquals(item1.name, "CacheEntry1")
         assertEquals(cache.size(), 1)
@@ -50,7 +50,7 @@ class CacheUnitTest {
             with(argumentBuilder("CacheEntry1")) {
                 return@Callable launch()
             }
-        }] ?:  TestObject()
+        } ] ?: TestObject()
 
         assertEquals(item1.name, item2.name)
         assertEquals(cache.size(), 1)
@@ -66,7 +66,7 @@ class CacheUnitTest {
             with(argumentBuilder("CacheEntry1")) {
                 return@Callable launch()
             }
-        }] ?: TestObject()
+        } ] ?: TestObject()
 
         assertEquals(cache.size(), 1)
         assertNotEquals(item1.name, "CacheEntry2")
@@ -75,11 +75,10 @@ class CacheUnitTest {
             with(argumentBuilder("CacheEntry2")) {
                 return@Callable launch()
             }
-        }] ?: TestObject()
+        } ] ?: TestObject()
 
         assertEquals(item2.name, "CacheEntry2")
         assertEquals(cache.size(), 2)
-
     }
 
     @Test
@@ -92,7 +91,7 @@ class CacheUnitTest {
             with(argumentBuilder("CacheEntry1")) {
                 return@Callable launch()
             }
-        }] ?: TestObject()
+        } ] ?: TestObject()
 
         assertEquals(cache.size(), 1)
         assertEquals(item1.name, "CacheEntry1")
@@ -101,7 +100,7 @@ class CacheUnitTest {
             with(argumentBuilder("CacheEntry2")) {
                 return@Callable launch()
             }
-        }] ?: TestObject()
+        } ] ?: TestObject()
 
         assertEquals(cache.size(), 1)
         assertEquals(item2.name, "CacheEntry2")
@@ -117,7 +116,7 @@ class CacheUnitTest {
             with(argumentBuilder("CacheEntry1")) {
                 return@Callable launch()
             }
-        }] ?: TestObject()
+        } ] ?: TestObject()
 
         assertEquals(1, cache.size())
         assertEquals("CacheEntry1", item1.name)
@@ -136,12 +135,11 @@ class CacheUnitTest {
     private fun emulateLaunchCommand(args: ArgumentListBuilder): TestObject {
         val list = args.toList()
         val requestedKeys: MutableList<TestObject> = arrayListOf()
-        list.forEach{word -> requestedKeys.add(TestObject(word))}
+        list.forEach { word -> requestedKeys.add(TestObject(word)) }
         return requestedKeys[0]
     }
 
     data class TestObject(
             val name: String = ""
     )
-
 }

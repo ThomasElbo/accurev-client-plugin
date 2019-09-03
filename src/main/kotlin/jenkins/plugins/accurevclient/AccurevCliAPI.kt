@@ -9,8 +9,31 @@ import hudson.Launcher.LocalLauncher
 import hudson.model.TaskListener
 import hudson.util.ArgumentListBuilder
 import hudson.util.Secret
-import jenkins.plugins.accurevclient.commands.*
-import jenkins.plugins.accurevclient.model.*
+import jenkins.plugins.accurevclient.commands.HistCommand
+import jenkins.plugins.accurevclient.commands.LoginCommand
+import jenkins.plugins.accurevclient.commands.StreamCommand
+import jenkins.plugins.accurevclient.commands.UpdateCommand
+import jenkins.plugins.accurevclient.commands.PopulateCommand
+import jenkins.plugins.accurevclient.commands.KeepCommand
+import jenkins.plugins.accurevclient.commands.DepotCommand
+import jenkins.plugins.accurevclient.commands.WorkspaceCommand
+import jenkins.plugins.accurevclient.commands.PromoteCommand
+import jenkins.plugins.accurevclient.commands.FilesCommand
+import jenkins.plugins.accurevclient.commands.AddCommand
+import jenkins.plugins.accurevclient.commands.ChangeWSCommand
+import jenkins.plugins.accurevclient.model.AccurevWorkspaces
+import jenkins.plugins.accurevclient.model.AccurevReferenceTrees
+import jenkins.plugins.accurevclient.model.AccurevDepots
+import jenkins.plugins.accurevclient.model.AccurevStreams
+import jenkins.plugins.accurevclient.model.AccurevDepot
+import jenkins.plugins.accurevclient.model.AccurevStream
+import jenkins.plugins.accurevclient.model.AccurevTransaction
+import jenkins.plugins.accurevclient.model.AccurevTransactions
+import jenkins.plugins.accurevclient.model.AccurevInfo
+import jenkins.plugins.accurevclient.model.AccurevUpdate
+import jenkins.plugins.accurevclient.model.AccurevFiles
+import jenkins.plugins.accurevclient.model.AccurevFile
+import jenkins.plugins.accurevclient.model.AccurevStreamType
 
 import jenkins.plugins.accurevclient.utils.defaultCharset
 import jenkins.plugins.accurevclient.utils.isNotEmpty
@@ -20,10 +43,10 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.io.UnsupportedEncodingException
-import java.util.*
+import java.util.Date
+
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
-
 
 class AccurevCliAPI(
         @Transient private val workspace: FilePath?,
@@ -86,7 +109,6 @@ class AccurevCliAPI(
             override fun execute() {
                 launchCommand(args)
             }
-
         }
     }
 
@@ -102,7 +124,6 @@ class AccurevCliAPI(
             override fun execute() {
                 launchCommand(args)
             }
-
         }
     }
 
@@ -123,7 +144,6 @@ class AccurevCliAPI(
             override fun execute() {
                 launchCommand(args)
             }
-
         }
     }
 
@@ -154,15 +174,14 @@ class AccurevCliAPI(
             override fun execute() {
                 launchCommand(args)
             }
-
         }
     }
 
-    override fun promote() : PromoteCommand {
+    override fun promote(): PromoteCommand {
         return object : PromoteCommand {
             private val args = accurev("promote", false)
 
-            override fun files(files: List<String>) : PromoteCommand {
+            override fun files(files: List<String>): PromoteCommand {
                 files.forEach { args.add(it) }
                 return this
             }
@@ -175,14 +194,13 @@ class AccurevCliAPI(
             override fun execute() {
                 launchCommand(args)
             }
-
         }
     }
 
-    override fun workspace() : WorkspaceCommand {
+    override fun workspace(): WorkspaceCommand {
         return object : WorkspaceCommand {
             private val args = accurev("mkws", false)
-            override fun create(name: String, backingStream: String) : WorkspaceCommand{
+            override fun create(name: String, backingStream: String): WorkspaceCommand {
                 args.add("-w", name)
                 args.add("-b", backingStream)
                 args.add("-l", workspace.toString())
@@ -192,9 +210,7 @@ class AccurevCliAPI(
             override fun execute() {
                 launchCommand(args)
             }
-
         }
-
     }
 
     override fun files(): FilesCommand {
@@ -207,7 +223,7 @@ class AccurevCliAPI(
             }
 
             override fun overwrite(overwrite: Boolean): FilesCommand {
-                if(overwrite) args.add("-O")
+                if (overwrite) args.add("-O")
                 return this
             }
 
@@ -223,7 +239,6 @@ class AccurevCliAPI(
             override fun execute() {
                 launchCommand(args)
             }
-
         }
     }
 
@@ -237,11 +252,11 @@ class AccurevCliAPI(
                 return this
             }
 
-            override fun shallow() : PopulateCommand {
+            override fun shallow(): PopulateCommand {
                 return this.shallow(true)
             }
 
-            override fun shallow(shallow : Boolean) : PopulateCommand {
+            override fun shallow(shallow: Boolean): PopulateCommand {
                 this.shallow = shallow
                 return this
             }
@@ -308,12 +323,12 @@ class AccurevCliAPI(
         return object : ChangeWSCommand {
             val args = accurev("chws", false)
 
-            override fun name(name : String): ChangeWSCommand {
+            override fun name(name: String): ChangeWSCommand {
                 args.add("-w", name)
                 return this
             }
 
-            override fun location(location : String): ChangeWSCommand {
+            override fun location(location: String): ChangeWSCommand {
                 args.add("-l", location)
                 return this
             }
@@ -321,7 +336,6 @@ class AccurevCliAPI(
             override fun execute() {
                 launchCommand(args)
             }
-
         }
     }
 
@@ -377,30 +391,30 @@ class AccurevCliAPI(
         }, this, listOf("chstream", "defcomp", "mkstream")] ?: AccurevStreams()
     }
 
-    override fun getFile(stream: String, path: String, transaction: String) : String {
+    override fun getFile(stream: String, path: String, transaction: String): String {
         try {
             populate().timespec(transaction).elements(hashSetOf(path)).stream(stream).overrideFile().execute()
-        }catch(e: AccurevException) {
-            return "";
+        } catch (e: AccurevException) {
+            return ""
         }
-        val f =  File("$workspace/$path")
+        val f = File("$workspace/$path")
         val content = f.readText()
         return content
     }
 
-    override fun getFiles(stream: String) : AccurevFiles {
-        val key = if(stream.isNotBlank()) "$server:$:$stream" else server
+    override fun getFiles(stream: String): AccurevFiles {
+        val key = if (stream.isNotBlank()) "$server:$:$stream" else server
         return cachedAccurevFiles[key, Callable {
             with(accurev("files", true)) {
-                if(stream.isNotBlank()) add ("-s", stream)
+                if (stream.isNotBlank()) add ("-s", stream)
                 return@Callable launch().unmarshal() as AccurevFiles
             }
         }, this] ?: AccurevFiles()
     }
 
-    override fun fileExists(name: String, stream: String) : Boolean {
+    override fun fileExists(name: String, stream: String): Boolean {
         val accurevFiles = getFiles(stream)
-        if(accurevFiles.files.isEmpty()) return false
+        if (accurevFiles.files.isEmpty()) return false
         return accurevFiles.files.contains(AccurevFile(name))
     }
 
@@ -433,16 +447,16 @@ class AccurevCliAPI(
                 add("-R", "-s", stream, "streams")
                 return@Callable launch().unmarshal() as AccurevStreams
             }
-        }, this,  listOf("chstream", "defcomp", "mkstream")] ?: AccurevStreams()
+        }, this, listOf("chstream", "defcomp", "mkstream")] ?: AccurevStreams()
     }
 
-    override fun getNDepthChildStreams(depot: String, stream: String, depth: Long) : Collection<AccurevStream> {
+    override fun getNDepthChildStreams(depot: String, stream: String, depth: Long): Collection<AccurevStream> {
         val streams = getChildStreams(depot, stream)
         val childStreams = mutableListOf<AccurevStream>()
-        if(depth == 1L) {
+        if (depth == 1L) {
             streams.list.forEach {
-                if(it.parent != null) {
-                    if (it.parent!!.name == stream){
+                if (it.parent != null) {
+                    if (it.parent!!.name == stream) {
                         childStreams.add(it)
                     }
                 }
@@ -451,13 +465,13 @@ class AccurevCliAPI(
         }
         var queue: MutableList<String> = mutableListOf(stream)
 
-        for(i in 1..depth ) {
+        for (i in 1..depth ) {
             val iterator = queue.iterator()
             val temp = mutableListOf<AccurevStream>()
-            for(item in iterator) {
-                val stream = streams.list.firstOrNull{ x -> x.name == item}
-                if(stream != null) {
-                    if(stream.children.isNotEmpty()) {
+            for (item in iterator) {
+                val stream = streams.list.firstOrNull { x -> x.name == item }
+                if (stream != null) {
+                    if (stream.children.isNotEmpty()) {
                         temp.addAll(stream!!.children)
                         childStreams.addAll(stream!!.children)
                     }
@@ -465,12 +479,12 @@ class AccurevCliAPI(
             }
 
             queue = mutableListOf()
-            for(item in temp) { queue.add(item.name) }
+            for (item in temp) { queue.add(item.name) }
         }
         return childStreams.distinct()
     }
 
-    override fun fetchStreamTransactionHistory(stream: String, timeSpecLower: String, timeSpecUpper: String) : AccurevTransactions {
+    override fun fetchStreamTransactionHistory(stream: String, timeSpecLower: String, timeSpecUpper: String): AccurevTransactions {
         with(accurev("hist", true)) {
             val accurevTransactions = add("-t", "$timeSpecLower-$timeSpecUpper", "-s", stream).launch().unmarshal() as AccurevTransactions // Range
             accurevTransactions.transactions.forEach { transaction -> transaction.stream = stream }
@@ -478,10 +492,10 @@ class AccurevCliAPI(
         }
     }
 
-    override fun fetchDepotTransactionHistory(depot: String, timeSpecLower: String, timeSpecUpper: String, types: Collection<String>) : AccurevTransactions {
+    override fun fetchDepotTransactionHistory(depot: String, timeSpecLower: String, timeSpecUpper: String, types: Collection<String>): AccurevTransactions {
         with(accurev("hist", true)) {
             add("-t", "$timeSpecLower-$timeSpecUpper", "-p", depot)
-            types.forEach{
+            types.forEach {
                 add("-k", it)
             }
             return launch().unmarshal() as AccurevTransactions // Range
@@ -501,27 +515,26 @@ class AccurevCliAPI(
         }
     }
 
-    override fun getUpdatesFromAncestors( depot: String, stream : String, timeSpec : Long ) : MutableList<AccurevTransaction> {
+    override fun getUpdatesFromAncestors( depot: String, stream: String, timeSpec: Long ): MutableList<AccurevTransaction> {
         var s = this.fetchStream(depot, stream)
         var ts = timeSpec
         var updates: MutableCollection<AccurevTransaction> = mutableListOf()
         //updates.add(fetchTransaction(s!!.name))
 
-        while( s != null ){
-            var listOfTransactions = fetchStreamTransactionHistory(s.name, (timeSpec+1).toString())
+        while ( s != null ) {
+            var listOfTransactions = fetchStreamTransactionHistory(s.name, (timeSpec + 1).toString())
 
-            if(!listOfTransactions.transactions.isEmpty()) {
-                listOfTransactions.transactions.forEach { at -> if(at.id > ts) updates.add(at) }
+            if (!listOfTransactions.transactions.isEmpty()) {
+                listOfTransactions.transactions.forEach { at -> if (at.id > ts) updates.add(at) }
             }
 
-            if(s != null){
-                if(s.type == (AccurevStreamType.Snapshot) ||  ((s.time != null) && (s.time!!.before( Date(System.currentTimeMillis()))))){
+            if (s != null) {
+                if (s.type == (AccurevStreamType.Snapshot) || ((s.time != null) && (s.time!!.before( Date(System.currentTimeMillis()))))) {
                     break
                 }
             }
 
             s = this.fetchStream(depot, s.parent?.name ?: "")
-
         }
 
         return (updates.sortedByDescending { x -> x.id }).toMutableList()

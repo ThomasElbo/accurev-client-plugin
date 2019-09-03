@@ -4,7 +4,6 @@ class MkFunctions(client: AccurevClient) {
 
     private val client: AccurevClient = client
 
-
     @Throws(Exception::class)
     fun mkDepot(): String {
         val depot = generateString(10)

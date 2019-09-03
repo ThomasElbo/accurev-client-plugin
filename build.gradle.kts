@@ -22,12 +22,12 @@ plugins {
     id("com.jfrog.artifactory") version "4.9.8"
     `maven-publish`
     jacoco
-	java
+    java
 }
 val spekVersion = "1.1.5"
 val junitPlatformVersion = "1.1.0"
 dependencies {
-	testRuntime("org.junit.platform:junit-platform-gradle-plugin:1.2.0")
+    testRuntime("org.junit.platform:junit-platform-gradle-plugin:1.2.0")
     testRuntime("org.junit.jupiter:junit-jupiter-api:5.2.0")
     testCompile("org.junit.jupiter:junit-jupiter-api:5.2.0")
     testCompile("ch.tutteli:atrium-cc-en_UK-robstoll:$atriumVersion")
@@ -36,14 +36,19 @@ dependencies {
 
     //jenkinsPlugins("org.jenkins-ci.plugins.kotlin:kotlin-v1-stdlib-jdk8:1.0-SNAPSHOT")
     jenkinsTest("org.jenkins-ci.main:jenkins-test-harness:$jenkinsTestHarnessVersion") { isTransitive = true }
-    jenkinsPlugins(group = "org.jenkins-ci.plugins", name =  "credentials", version = "2.1.18")
+    jenkinsPlugins(group = "org.jenkins-ci.plugins", name = "credentials", version = "2.1.18")
     jenkinsPlugins(group = "org.jenkins-ci.plugins", name = "credentials-binding", version = "1.18")
-    testCompile("org.jfrog.buildinfo:build-info-extractor-gradle:latest.release")
+    testCompile("org.jfrog.buildinfo:build-info-extractor-gradle:latest.release") {
+        exclude(group = "com.google.guava")
+    }
     kapt("net.java.sezpoz:sezpoz:$sezpozVersion")
-	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51")
-    compile("com.palantir.docker.compose:docker-compose-rule-junit4:1.2.2")
-    //compile("com.google.guava:guava:27.0.1-jre")
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51")
+    compile("com.palantir.docker.compose:docker-compose-rule-junit4:0.36.3-rc1")
+    testCompile("com.google.guava:guava:27.0.1-jre")
+    compile("com.google.guava:guava:27.0.1-jre")
 }
+
+
 
 jenkinsPlugin {
 
@@ -93,15 +98,13 @@ java {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
-
-
 artifactory {
-    setContextUrl("http://localhost:8082/artifactory")
+    setContextUrl("https://testartifactory.widex.io")
     publish(delegateClosureOf<PublisherConfig> {
         repository(delegateClosureOf<GroovyObject> {
-            setProperty("repoKey", "generic-local")
-            setProperty("username", "admin")
-            setProperty("password", "artifactory")
+            setProperty("repoKey", "maven-playground")
+            setProperty("username", "tmel")
+            setProperty("password", "Lyn331sno28")
             setProperty("maven", true)
         })
         defaults(delegateClosureOf<GroovyObject> {
@@ -112,7 +115,6 @@ artifactory {
     })
 }
 
-
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
@@ -121,10 +123,10 @@ publishing {
             version = "1.0.0-SNAPSHOT"
 
             artifact("$buildDir/libs/accurev-client.hpi")
+            artifact("$buildDir/libs/accurev-client-plugin-1.0.0-SNAPSHOT.jar")
 
             pom {
                 withXml {
-                  
                 }
             }
         }
@@ -149,12 +151,11 @@ task<Wrapper>("wrapper") {
     distributionType = Wrapper.DistributionType.ALL
 }
 
-
 repositories {
     maven(url = "https://repo.jenkins-ci.org/public/")
-    maven(url = "https://dl.bintray.com/palantir/releases")
+
     jcenter()
-	mavenCentral()
+    mavenCentral()
 }
 
 // Workaround for https://issues.jenkins-ci.org/browse/JENKINS-48353
@@ -164,6 +165,7 @@ configurations.all { exclude(module = "junit-dep") }
 buildscript {
     repositories {
         maven(url = "https://repo.jenkins-ci.org/public/")
+        maven(url = "https://dl.bintray.com/palantir/releases")
         maven(url = "https://mvnrepository.com/artifact/com.google.guava/guava")
         jcenter()
     }

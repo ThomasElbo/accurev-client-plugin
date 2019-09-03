@@ -4,9 +4,11 @@ import com.palantir.docker.compose.DockerComposeRule
 import hudson.EnvVars
 import hudson.model.TaskListener
 import hudson.util.Secret
+import junit.framework.Assert.assertEquals
+import junit.framework.Assert.assertTrue
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.hasProperty
-import org.junit.Assert.*
 import org.junit.Assume
 import org.junit.ClassRule
 import org.junit.Rule
@@ -26,8 +28,6 @@ class CacheTest {
                 .file("src/docker/docker-compose.yml")
                 .build()
     }
-
-
 
     @Test
     fun testCacheServerValidation() {
@@ -55,7 +55,6 @@ class CacheTest {
         val depot = create.mkDepot()
         val stream = create.mkStream(depot)
 
-
         var streams = client.getStreams(depot)
 
         assertEquals(2, streams.list.size)
@@ -73,7 +72,5 @@ class CacheTest {
                 hasProperty("name", Is(stream)),
                 hasProperty("name", Is(stream2))
         ))
-
     }
-
 }

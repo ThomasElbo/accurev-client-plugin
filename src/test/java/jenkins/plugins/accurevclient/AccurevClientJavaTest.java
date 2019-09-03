@@ -9,40 +9,40 @@ import jenkins.plugins.accurevclient.model.AccurevFiles;
 import jenkins.plugins.accurevclient.model.AccurevStream;
 import jenkins.plugins.accurevclient.model.AccurevStreams;
 import jenkins.plugins.accurevclient.model.AccurevTransaction;
+import jenkins.plugins.accurevclient.model.AccurevWorkspace;
+import jenkins.plugins.accurevclient.model.AccurevWorkspaces;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.MockFolder;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.beans.HasProperty.hasProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assume.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
 
 public class AccurevClientJavaTest {
     @Rule public JenkinsRule rule = new JenkinsRule();
+
+    @Rule
+    public TemporaryFolder temp = new TemporaryFolder();
 
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder()
             .file("src/docker/docker-compose.yml")
             .build();
-
-
 
 
     @Test public void loginCommand() throws Exception {
@@ -162,6 +162,7 @@ public class AccurevClientJavaTest {
 
 
         mkWorkspace(depotName, client);
+
         File f = new File(project.getBuildDir() + "/file");
         f.createNewFile();
         List<String> files = new ArrayList<>();
@@ -273,7 +274,7 @@ public class AccurevClientJavaTest {
         );
         FreeStyleProject project = rule.createFreeStyleProject();
         Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
-                .at(project.getBuildDir()).on(url);
+                .at(temp.getRoot()).on(url);
         AccurevClient client = accurev.getClient();
 
         client.login().username(username).password(Secret.fromString(password)).execute();
@@ -285,18 +286,22 @@ public class AccurevClientJavaTest {
         AccurevStreams streams = client.getChildStreams(depotName, streamName);
 
         assertEquals(1, streams.getList().size());
-
-        String s = mkWorkspace(streamName, client);
+        String workspace = mkWorkspace(streamName, client);
 
         assertTrue(client.getInfo().getInWorkspace());
+        //temp.newFile("newWS");
 
-        File f = new File("newWS");
-        assertTrue(f.mkdir());
+        temp.newFolder("newWS");
+        File f = new File(temp.getRoot() + "/newWS");
+        assertTrue(f.exists());
 
-        client.changeWS().name(s).location(f.getAbsolutePath()).execute();
+        client.changeWS().name(workspace).location(f.getAbsolutePath()).execute();
         assertFalse(client.getInfo().getInWorkspace());
-        assertEquals(client.getWorkspaces().getList().get(0).getStorage(), (f.getAbsolutePath().replace('\\', '/')));
 
+        AccurevWorkspaces accurevWorkspace = client.getWorkspaces();
+        String storage = accurevWorkspace.getList().get(0).getStorage();
+        String replace = f.getAbsolutePath().replace('\\', '/');
+        assertEquals(storage, replace);
         Files.deleteIfExists(f.toPath());
     }
 

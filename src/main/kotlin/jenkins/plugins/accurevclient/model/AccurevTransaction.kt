@@ -39,8 +39,8 @@ data class AccurevTransaction(
     @field:XmlElement
     var stream: String? = null
 ) {
-    fun affectedPaths() : List<String> {
-        if(version != null ) {
+    fun affectedPaths(): List<String> {
+        if (version != null ) {
             val paths = mutableListOf<String>()
             version.forEach { v -> paths.add(v.path) }
             return paths
