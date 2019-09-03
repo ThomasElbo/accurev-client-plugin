@@ -1,9 +1,8 @@
 language: java
 jdk:
-  - oraclejdk8
   - openjdk8
 script:
-  - ./gradlew clean assemble check jacocoTestReport
+  - travis_wait 25 ./gradlew clean assemble check jacocoTestReport
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 before_cache:
