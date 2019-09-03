@@ -142,6 +142,9 @@ tasks {
             jvmTarget = jvmVersion as String
         }
     }
+    withType<Test> {
+        testLogging.showStandardStreams = true
+    }
 }
 
 task<Wrapper>("wrapper") {
