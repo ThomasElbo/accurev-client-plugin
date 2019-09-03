@@ -48,8 +48,6 @@ dependencies {
     compile("com.google.guava:guava:27.0.1-jre")
 }
 
-
-
 jenkinsPlugin {
 
     coreVersion = "2.74"
