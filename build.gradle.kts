@@ -153,7 +153,8 @@ task<Wrapper>("wrapper") {
 
 repositories {
     maven(url = "https://repo.jenkins-ci.org/public/")
-
+    maven(url = "https://dl.bintray.com/palantir/releases")
+    maven(url = "https://mvnrepository.com/artifact/com.google.guava/guava")
     jcenter()
     mavenCentral()
 }
