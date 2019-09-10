@@ -11,7 +11,7 @@ class Cache<K, V> @JvmOverloads constructor(duration: Int, unit: TimeUnit, maxEn
 
     private val expireAfterNanos: Long = unit.toNanos(duration.toLong())
 
-    private var lastUpdate: Long = 1
+    var lastUpdate: Long = 1
 
     init {
         this.entries = LimitedMap(maxEntries)
@@ -27,15 +27,15 @@ class Cache<K, V> @JvmOverloads constructor(duration: Int, unit: TimeUnit, maxEn
         val result: V
         val parts = key.toString().split(":")
         if (!types!!.isEmpty() && parts.size > 2) {
-
-            val updates = client!!.fetchDepotTransactionHistory(parts[parts.size - 1], lastUpdate.toString(), "now", types)
+            val updates = client!!.fetchDepotTransactionHistory(parts[3], lastUpdate.toString(), "now", types)
             if (!updates.transactions.isEmpty()) {
                 try {
-                    lastUpdate = updates.transactions.last().id
+
                     result = callable.call()
                 } catch (e: Exception) {
                         throw ExecutionException("Cannot load value for key: " + key, e)
                 }
+                lastUpdate = updates.transactions.last().id
                 return doPut(key, result)
             }
         }
@@ -55,6 +55,7 @@ class Cache<K, V> @JvmOverloads constructor(duration: Int, unit: TimeUnit, maxEn
 
     fun evictAll() {
         entries.clear()
+        lastUpdate = 1
     }
 
     fun size(): Int {

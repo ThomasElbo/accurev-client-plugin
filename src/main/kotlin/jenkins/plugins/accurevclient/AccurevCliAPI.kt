@@ -11,6 +11,7 @@ import hudson.util.ArgumentListBuilder
 import hudson.util.Secret
 import jenkins.plugins.accurevclient.commands.HistCommand
 import jenkins.plugins.accurevclient.commands.LoginCommand
+import jenkins.plugins.accurevclient.commands.LogoutCommand
 import jenkins.plugins.accurevclient.commands.StreamCommand
 import jenkins.plugins.accurevclient.commands.UpdateCommand
 import jenkins.plugins.accurevclient.commands.PopulateCommand
@@ -90,8 +91,8 @@ class AccurevCliAPI(
             }
 
             @Throws(AccurevException::class, InterruptedException::class)
-            override fun execute() {
-                launchCommand(args)
+            override fun execute(): String {
+                return launchCommand(args)
             }
         }
     }
@@ -106,8 +107,8 @@ class AccurevCliAPI(
                 return this
             }
 
-            override fun execute() {
-                launchCommand(args)
+            override fun execute(): String {
+                return launchCommand(args)
             }
         }
     }
@@ -121,8 +122,8 @@ class AccurevCliAPI(
                 return this
             }
 
-            override fun execute() {
-                launchCommand(args)
+            override fun execute(): String {
+                return launchCommand(args)
             }
         }
     }
@@ -141,8 +142,8 @@ class AccurevCliAPI(
                 return this
             }
 
-            override fun execute() {
-                launchCommand(args)
+            override fun execute(): String {
+                return launchCommand(args)
             }
         }
     }
@@ -171,8 +172,8 @@ class AccurevCliAPI(
                 return this
             }
 
-            override fun execute() {
-                launchCommand(args)
+            override fun execute(): String {
+                return launchCommand(args)
             }
         }
     }
@@ -191,8 +192,8 @@ class AccurevCliAPI(
                 return this
             }
 
-            override fun execute() {
-                launchCommand(args)
+            override fun execute(): String {
+                return launchCommand(args)
             }
         }
     }
@@ -207,8 +208,8 @@ class AccurevCliAPI(
                 return this
             }
 
-            override fun execute() {
-                launchCommand(args)
+            override fun execute(): String {
+                return launchCommand(args)
             }
         }
     }
@@ -236,8 +237,8 @@ class AccurevCliAPI(
                 TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
 
-            override fun execute() {
-                launchCommand(args)
+            override fun execute(): String {
+                return launchCommand(args)
             }
         }
     }
@@ -287,8 +288,8 @@ class AccurevCliAPI(
             }
 
             @Throws(AccurevException::class, InterruptedException::class)
-            override fun execute() {
-                launchCommand(args)
+            override fun execute(): String {
+                return launchCommand(args)
             }
         }
     }
@@ -313,8 +314,8 @@ class AccurevCliAPI(
             }
 
             @Throws(AccurevException::class, InterruptedException::class)
-            override fun execute() {
-                launchCommand(args)
+            override fun execute(): String {
+                return launchCommand(args)
             }
         }
     }
@@ -333,8 +334,8 @@ class AccurevCliAPI(
                 return this
             }
 
-            override fun execute() {
-                launchCommand(args)
+            override fun execute(): String {
+                return launchCommand(args)
             }
         }
     }
@@ -503,10 +504,10 @@ class AccurevCliAPI(
     }
 
     override fun getUpdatedElements(
-        stream: String,
-        latestTransaction: Long,
-        previousTransaction: Long,
-        referenceTree: Boolean
+            stream: String,
+            latestTransaction: Long,
+            previousTransaction: Long,
+            referenceTree: Boolean
     ): AccurevUpdate {
         with(accurev("update", true)) {
             add(if (referenceTree) "-r" else "-s", stream)
@@ -519,7 +520,6 @@ class AccurevCliAPI(
         var s = this.fetchStream(depot, stream)
         var ts = timeSpec
         var updates: MutableCollection<AccurevTransaction> = mutableListOf()
-        //updates.add(fetchTransaction(s!!.name))
 
         while ( s != null ) {
             var listOfTransactions = fetchStreamTransactionHistory(s.name, (timeSpec + 1).toString())
@@ -551,6 +551,15 @@ class AccurevCliAPI(
         }
     }
 
+    override fun resetCaches(): Boolean {
+        cachedAccurevDepots.evictAll()
+        cachedAccurevFiles.evictAll()
+        cachedAccurevReferenceTrees.evictAll()
+        cachedAccurevWorkspaces.evictAll()
+        cachedAccurevStreams.evictAll()
+        return true
+    }
+
     override fun getVersion(): String {
         val result = ArgumentListBuilder(accurevExe).launch()
         return result.split(' ')[1]
@@ -568,7 +577,7 @@ class AccurevCliAPI(
             override infix fun password(password: Secret): LoginCommand {
                 when {
                     password.isNotEmpty() -> args.addMasked(password)
-                // Workaround for https://issues.jenkins-ci.org/browse/JENKINS-39066
+                    // Workaround for https://issues.jenkins-ci.org/browse/JENKINS-39066
                     launcher.isUnix -> args.add("", true)
                     else -> args.addQuoted("", true)
                 }
@@ -576,8 +585,17 @@ class AccurevCliAPI(
             }
 
             @Throws(AccurevException::class, InterruptedException::class)
-            override fun execute() {
-                launchCommand(args)
+            override fun execute(): String {
+                return launchCommand(args)
+            }
+        }
+    }
+
+    override fun logout(): LogoutCommand {
+        return object : LogoutCommand {
+            private val args = accurev("logo")
+            override fun execute(): String {
+                return launchCommand(args)
             }
         }
     }
@@ -585,10 +603,10 @@ class AccurevCliAPI(
     @JvmOverloads
     @Throws(AccurevException::class, InterruptedException::class)
     fun launchCommand(
-        args: ArgumentListBuilder,
-        ws: FilePath? = workspace,
-        env: EnvVars = environment,
-        timeout: Int = TIMEOUT
+            args: ArgumentListBuilder,
+            ws: FilePath? = workspace,
+            env: EnvVars = environment,
+            timeout: Int = TIMEOUT
     ): String {
         val fos = ByteArrayOutputStream()
         val err = ByteArrayOutputStream()
@@ -607,7 +625,7 @@ class AccurevCliAPI(
             val result = fos.defaultCharset
             if (status != 0) {
                 throw AccurevException(
-                    """
+                        """
                     Command: '$command'
                     Exit code: $status
                     stdout: $result

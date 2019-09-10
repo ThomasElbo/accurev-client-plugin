@@ -1,5 +1,7 @@
 package jenkins.plugins.accurevclient
 
+import junit.framework.Assert.assertTrue
+
 class MkFunctions(client: AccurevClient) {
 
     private val client: AccurevClient = client
@@ -14,7 +16,11 @@ class MkFunctions(client: AccurevClient) {
     @Throws(Exception::class)
     fun mkStream(depot: String): String {
         val stream = generateString(10)
-        client.stream().create(stream, depot).execute()
+        val execute = client.stream().create(stream, depot).execute()
+        assertTrue(execute.contains(stream))
+
+        val streamExists = client.hist().stream(stream).depot(depot).execute()
+        assertTrue(streamExists.contains(stream))
         return stream
     }
 

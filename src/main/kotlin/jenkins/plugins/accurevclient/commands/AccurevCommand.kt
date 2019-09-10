@@ -4,5 +4,5 @@ import jenkins.plugins.accurevclient.AccurevException
 
 interface AccurevCommand {
     @Throws(AccurevException::class, InterruptedException::class)
-    fun execute()
+    fun execute(): String
 }

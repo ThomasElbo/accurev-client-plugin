@@ -11,74 +11,92 @@ import jenkins.plugins.accurevclient.model.AccurevStreams;
 import jenkins.plugins.accurevclient.model.AccurevTransaction;
 import jenkins.plugins.accurevclient.model.AccurevWorkspace;
 import jenkins.plugins.accurevclient.model.AccurevWorkspaces;
+import kotlin.jvm.JvmField;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.After;
 import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.rules.TemporaryFolder;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.MockFolder;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
+
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assume.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AccurevClientJavaTest {
-    @Rule public JenkinsRule rule = new JenkinsRule();
+    @ClassRule
+    public static JenkinsRule rule = new JenkinsRule();
 
-    @Rule
-    public TemporaryFolder temp = new TemporaryFolder();
+    @ClassRule
+    public static TemporaryFolder temp = new TemporaryFolder();
 
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder()
             .file("src/docker/docker-compose.yml")
             .build();
 
+    private static String url;
+    private static String username;
+    private static String password;
 
-    @Test public void loginCommand() throws Exception {
-        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
-        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "accurev_user";
-        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "docker";
-        assumeTrue("Can only run test with proper test setup",
-        AccurevTestUtils.checkCommandExist("accurev") &&
-                StringUtils.isNotBlank(url) &&
-                StringUtils.isNotBlank(username) &&
-                StringUtils.isNotEmpty(password)
-        );
-        FreeStyleProject project = rule.createFreeStyleProject();
-        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
-            .at(project.getBuildDir()).on(url);
-        AccurevClient client = accurev.getClient();
-        client.login().username(username).password(Secret.fromString(password)).execute();
-    }
 
-    @Test public void fetchLatestTransaction() throws Exception {
-        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
-        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "accurev_user";
-        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "docker";
+    @BeforeClass
+    public static void init() {
+        url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
+        username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "accurev_user";
+        password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "docker";
         assumeTrue("Can only run test with proper test setup",
                 AccurevTestUtils.checkCommandExist("accurev") &&
                         StringUtils.isNotBlank(url) &&
                         StringUtils.isNotBlank(username) &&
                         StringUtils.isNotEmpty(password)
         );
-        FreeStyleProject project = rule.createFreeStyleProject();
+    }
+    private FreeStyleProject project;
+    private AccurevClient client;
+
+    @Before
+    public void setup() throws IOException, InterruptedException {
+        project = rule.createFreeStyleProject();
         Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
                 .at(project.getBuildDir()).on(url);
-        AccurevClient client = accurev.getClient();
+        client = accurev.getClient();
         client.login().username(username).password(Secret.fromString(password)).execute();
         assertTrue(client.getInfo().getLoggedIn());
+    }
 
+    @After
+    public void tearDown() {
+        client.logout();
+        client.resetCaches();
+
+    }
+
+
+
+    @Test public void fetchLatestTransaction() throws Exception {
         String depotName = mkDepot(client);
         String streamName = mkStream(depotName, client);
         AccurevStreams streams = client.getChildStreams(depotName, streamName);
@@ -105,22 +123,6 @@ public class AccurevClientJavaTest {
     }
 
     @Test public void fetchStream() throws Exception {
-        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
-        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "accurev_user";
-        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "docker";
-        assumeTrue("Can only run test with proper test setup",
-                AccurevTestUtils.checkCommandExist("accurev") &&
-                        StringUtils.isNotBlank(url) &&
-                        StringUtils.isNotBlank(username) &&
-                        StringUtils.isNotEmpty(password)
-        );
-        FreeStyleProject project = rule.createFreeStyleProject();
-        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
-                .at(project.getBuildDir()).on(url);
-        AccurevClient client = accurev.getClient();
-        client.login().username(username).password(Secret.fromString(password)).execute();
-        assertTrue(client.getInfo().getLoggedIn());
-
         String depotName = mkDepot(client);
         String streamName = mkStream(depotName, client);
         AccurevStreams streams = client.getChildStreams(depotName, streamName);
@@ -133,23 +135,6 @@ public class AccurevClientJavaTest {
     }
 
     @Test public void getUpdatedParents() throws Exception {
-        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
-        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "accurev_user";
-        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "docker";
-        assumeTrue("Can only run test with proper test setup",
-                AccurevTestUtils.checkCommandExist("accurev") &&
-                        StringUtils.isNotBlank(url) &&
-                        StringUtils.isNotBlank(username) &&
-                        StringUtils.isNotEmpty(password)
-        );
-        FreeStyleProject project = rule.createFreeStyleProject();
-        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
-                .at(project.getBuildDir()).on(url);
-        AccurevClient client = accurev.getClient();
-
-        client.login().username(username).password(Secret.fromString(password)).execute();
-        assertTrue(client.getInfo().getLoggedIn());
-
         String depotName = mkDepot(client);
         String streamName = mkStream(depotName, client);
         AccurevStreams streams = client.getChildStreams(depotName, streamName);
@@ -178,23 +163,6 @@ public class AccurevClientJavaTest {
     }
 
     @Test public void testGetFiles() throws Exception {
-        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
-        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "accurev_user";
-        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "docker";
-        assumeTrue("Can only run test with proper test setup",
-                AccurevTestUtils.checkCommandExist("accurev") &&
-                        StringUtils.isNotBlank(url) &&
-                        StringUtils.isNotBlank(username) &&
-                        StringUtils.isNotEmpty(password)
-        );
-        FreeStyleProject project = rule.createFreeStyleProject();
-        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
-                .at(project.getBuildDir()).on(url);
-        AccurevClient client = accurev.getClient();
-
-        client.login().username(username).password(Secret.fromString(password)).execute();
-        assertTrue(client.getInfo().getLoggedIn());
-
         String depotName = mkDepot(client);
         String streamName = mkStream(depotName, client);
         AccurevStreams streams = client.getChildStreams(depotName, streamName);
@@ -221,23 +189,6 @@ public class AccurevClientJavaTest {
     }
 
     @Test public void testFindFile() throws Exception {
-        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
-        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "accurev_user";
-        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "docker";
-        assumeTrue("Can only run test with proper test setup",
-                AccurevTestUtils.checkCommandExist("accurev") &&
-                        StringUtils.isNotBlank(url) &&
-                        StringUtils.isNotBlank(username) &&
-                        StringUtils.isNotEmpty(password)
-        );
-        FreeStyleProject project = rule.createFreeStyleProject();
-        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
-                .at(project.getBuildDir()).on(url);
-        AccurevClient client = accurev.getClient();
-
-        client.login().username(username).password(Secret.fromString(password)).execute();
-        assertTrue(client.getInfo().getLoggedIn());
-
         String depotName = mkDepot(client);
         String streamName = mkStream(depotName, client);
         AccurevStreams streams = client.getChildStreams(depotName, streamName);
@@ -263,23 +214,6 @@ public class AccurevClientJavaTest {
     }
     
     @Test public void testChangeWorkspace() throws Exception {
-        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
-        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "accurev_user";
-        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "docker";
-        assumeTrue("Can only run test with proper test setup",
-                AccurevTestUtils.checkCommandExist("accurev") &&
-                        StringUtils.isNotBlank(url) &&
-                        StringUtils.isNotBlank(username) &&
-                        StringUtils.isNotEmpty(password)
-        );
-        FreeStyleProject project = rule.createFreeStyleProject();
-        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
-                .at(temp.getRoot()).on(url);
-        AccurevClient client = accurev.getClient();
-
-        client.login().username(username).password(Secret.fromString(password)).execute();
-        assertTrue(client.getInfo().getLoggedIn());
-
         String depotName = mkDepot(client);
         String streamName = mkStream(depotName, client);
 
@@ -289,7 +223,6 @@ public class AccurevClientJavaTest {
         String workspace = mkWorkspace(streamName, client);
 
         assertTrue(client.getInfo().getInWorkspace());
-        //temp.newFile("newWS");
 
         temp.newFolder("newWS");
         File f = new File(temp.getRoot() + "/newWS");
@@ -299,31 +232,14 @@ public class AccurevClientJavaTest {
         assertFalse(client.getInfo().getInWorkspace());
 
         AccurevWorkspaces accurevWorkspace = client.getWorkspaces();
-        String storage = accurevWorkspace.getList().get(0).getStorage();
-        String replace = f.getAbsolutePath().replace('\\', '/');
-        assertEquals(storage, replace);
-        Files.deleteIfExists(f.toPath());
+        List<AccurevWorkspace> wsList = accurevWorkspace.getList();
+        Optional<AccurevWorkspace> ws = wsList.stream().filter(wspace -> wspace.getName().contains(workspace)).findAny();
+
+        assertEquals(f.getAbsolutePath(), ws.get().getStorage().replace("/", "\\"));
     }
 
 
     @Test public void getNDepthChildStreams() throws Exception {
-        String url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
-        String username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "accurev_user";
-        String password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "docker";
-        assumeTrue("Can only run test with proper test setup",
-                AccurevTestUtils.checkCommandExist("accurev") &&
-                        StringUtils.isNotBlank(url) &&
-                        StringUtils.isNotBlank(username) &&
-                        StringUtils.isNotEmpty(password)
-        );
-        FreeStyleProject project = rule.createFreeStyleProject();
-        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
-                .at(project.getBuildDir()).on(url);
-        AccurevClient client = accurev.getClient();
-
-        client.login().username(username).password(Secret.fromString(password)).execute();
-        assertTrue(client.getInfo().getLoggedIn());
-
         String depotName = mkDepot(client);
         String streamD1 = mkStream(depotName, client);
         String streamD2 = mkStream(streamD1, client);
@@ -408,7 +324,8 @@ public class AccurevClientJavaTest {
 
     private String mkStream(String depot, AccurevClient client) throws Exception {
         String stream = generateString(10);
-        client.stream().create(stream, depot).execute();
+        String execute = client.stream().create(stream, depot).execute();
+        assertTrue(execute.contains(stream));
         return stream;
     }
 

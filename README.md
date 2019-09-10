@@ -1,6 +1,6 @@
 # accurev-client-plugin
-[![codecov](https://codecov.io/gh/casz/accurev-client-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/casz/accurev-client-plugin)
-[![Build Status](https://travis-ci.org/casz/accurev-client-plugin.svg?branch=master)](https://travis-ci.org/casz/accurev-client-plugin)
+[![codecov](https://codecov.io/gh/WiMills/accurev-client-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/WiMills/accurev-client-plugin)
+[![Build Status](https://travis-ci.org/WiMills/accurev-client-plugin.svg?branch=master)](https://travis-ci.org/WiMills/accurev-client-plugin)
 
 Early development, however, there is a strong need for splitting the code base.
 
