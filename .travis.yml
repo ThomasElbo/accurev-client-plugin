@@ -1,6 +1,12 @@
 language: java
 jdk:
   - openjdk8
+services:
+  - docker
+before_install:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker pull wimill/accurev:latest
+  - docker ps -a
 script:
   - ./gradlew clean
   - ./gradlew assemble
