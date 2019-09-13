@@ -20,11 +20,12 @@ import org.jvnet.hudson.test.JenkinsRule
 
 class CacheTest {
 
-    @Rule
-    @JvmField
-    val rule = JenkinsRule()
 
     companion object {
+        @ClassRule
+        @JvmField
+        val rule = JenkinsRule()
+
         @ClassRule
         @JvmField
         val docker = DockerComposeRule.builder()

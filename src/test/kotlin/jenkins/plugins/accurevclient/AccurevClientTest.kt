@@ -6,18 +6,23 @@ import hudson.model.TaskListener
 import hudson.util.Secret
 import junit.framework.Assert.assertTrue
 import org.junit.Assume.assumeTrue
+import org.junit.ClassRule
 import org.junit.Rule
 import org.junit.Test
 import org.jvnet.hudson.test.JenkinsRule
 
 class AccurevClientTest {
-    @Rule @JvmField
-    val rule = JenkinsRule()
 
-    @Rule @JvmField
-    var docker = DockerComposeRule.builder()
-            .file("src/docker/docker-compose.yml")
-            .build()
+    companion object {
+        @ClassRule @JvmField
+        val rule = JenkinsRule()
+
+        @ClassRule
+        @JvmField
+        var docker = DockerComposeRule.builder()
+                .file("src/docker/docker-compose.yml")
+                .build()!!
+    }
 
     @Test
     fun loginCommand() {
