@@ -12,24 +12,20 @@ import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasProperty
 import org.junit.Assume
-import org.junit.ClassRule
+import org.junit.Rule
 import org.junit.Test
 
 import org.jvnet.hudson.test.JenkinsRule
 
 class CacheTest {
 
-    companion object {
-        @ClassRule
-        @JvmField
-        val rule = JenkinsRule()
-
-        @ClassRule
-        @JvmField
-        val docker = DockerComposeRule.builder()
-                .file("src/docker/docker-compose.yml")
-                .build()!!
-    }
+    @Rule @JvmField
+    val docker = DockerComposeRule.builder()
+            .file("src/docker/docker-compose.yml")
+            .build()!!
+    @Rule
+    @JvmField
+    val rule = JenkinsRule()
 
     @Test
     fun testCacheServerValidation() {

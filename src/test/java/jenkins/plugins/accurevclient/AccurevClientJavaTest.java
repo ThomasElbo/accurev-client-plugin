@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -46,14 +47,14 @@ import static org.junit.Assume.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AccurevClientJavaTest {
-    @ClassRule
-    public static JenkinsRule rule = new JenkinsRule();
+    @Rule
+    public JenkinsRule rule = new JenkinsRule();
 
-    @ClassRule
-    public static TemporaryFolder temp = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temp = new TemporaryFolder();
 
-    @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()
+    @Rule
+    public DockerComposeRule docker = DockerComposeRule.builder()
             .file("src/docker/docker-compose.yml")
             .build();
 
