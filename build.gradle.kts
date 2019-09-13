@@ -136,7 +136,7 @@ tasks {
     withType<JacocoReport> {
         reports {
             xml.isEnabled
-            html.destination = file("$buildDir/jacocoHtml")
+            xml.destination = file("jacocoXml")
         }
     }
     withType<KotlinCompile> {
