@@ -90,7 +90,6 @@ spotless {
 
 jacoco {
     toolVersion = jacocoVersion as String
-    reportsDir = file("$buildDir/customJacocoReportDir")
 }
 
 java {
@@ -136,7 +135,6 @@ tasks {
     withType<JacocoReport> {
         reports {
             xml.isEnabled
-            xml.destination = file("jacocoXml")
         }
     }
     withType<KotlinCompile> {
