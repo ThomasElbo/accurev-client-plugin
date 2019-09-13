@@ -11,7 +11,6 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasProperty
-import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test
 
