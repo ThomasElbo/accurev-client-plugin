@@ -13,13 +13,11 @@ import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasProperty
 import org.junit.Assume
 import org.junit.ClassRule
-import org.junit.Rule
 import org.junit.Test
 
 import org.jvnet.hudson.test.JenkinsRule
 
 class CacheTest {
-
 
     companion object {
         @ClassRule

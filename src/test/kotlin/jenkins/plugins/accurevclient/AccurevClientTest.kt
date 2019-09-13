@@ -7,7 +7,6 @@ import hudson.util.Secret
 import junit.framework.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.ClassRule
-import org.junit.Rule
 import org.junit.Test
 import org.jvnet.hudson.test.JenkinsRule
 
