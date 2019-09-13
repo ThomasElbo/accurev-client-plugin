@@ -4,6 +4,7 @@ import com.palantir.docker.compose.DockerComposeRule
 import hudson.EnvVars
 import hudson.model.TaskListener
 import hudson.util.Secret
+import junit.framework.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
@@ -38,5 +39,6 @@ class AccurevClientTest {
             password(Secret.fromString(password))
             execute()
         }
+        assertTrue(client.getInfo().loggedIn)
     }
 }

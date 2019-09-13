@@ -71,7 +71,5 @@ class CacheTest {
                 hasProperty("name", equalTo(stream)),
                 hasProperty("name", equalTo(stream2))
         ))
-
-        client.logout()
     }
 }
