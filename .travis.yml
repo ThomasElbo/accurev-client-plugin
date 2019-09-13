@@ -8,7 +8,7 @@ before_install:
   - docker pull wimill/accurev:latest
   - docker ps -a
 script:
-  - ./gradlew clean assemble check --info jacocoTestReport
+  - ./gradlew clean assemble test --debug
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 before_cache:
