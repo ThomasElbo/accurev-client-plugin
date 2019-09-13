@@ -134,7 +134,8 @@ publishing {
 tasks {
     withType<JacocoReport> {
         reports {
-            xml.isEnabled
+            xml.isEnabled = true
+            xml.destination = file("$buildDir/jacoco/test/report.xml")
         }
     }
     withType<KotlinCompile> {
