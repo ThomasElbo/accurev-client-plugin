@@ -32,12 +32,12 @@ class CacheTest {
         val url = System.getenv("_ACCUREV_URL") ?: "localhost:5050"
         val username = System.getenv("_ACCUREV_USERNAME") ?: "accurev_user"
         val password = System.getenv("_ACCUREV_PASSWORD") ?: "docker"
-//        Assume.assumeTrue("Can only run test with proper test setup",
-//                "accurev".checkCommandExist() &&
-//                        url.isNotBlank() &&
-//                        username.isNotBlank() &&
-//                        password.isNotEmpty()
-//        )
+        Assume.assumeTrue("Can only run test with proper test setup",
+                "accurev".checkCommandExist() &&
+                        url.isNotBlank() &&
+                        username.isNotBlank() &&
+                        password.isNotEmpty()
+        )
         System.err.println("Creating project")
         val project = rule.createFreeStyleProject()
         val accurev = Accurev.with(TaskListener.NULL, EnvVars())
