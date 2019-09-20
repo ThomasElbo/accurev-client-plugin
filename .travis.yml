@@ -9,7 +9,7 @@ before_install:
   - ./pull_client_image.sh
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker pull wimill/accurev:latest
-  - docker-compose up -f ./src/docker/docker-compose.yml
+  - docker-compose -f ./src/docker/docker-compose.yml up
   - docker exec -it accurev-client /tmp/accurev-7.3-linux-x64-clientonly.bin -i silent -f installer.properties
   - docker cp . accurev-client:accurev-client/
 script:
