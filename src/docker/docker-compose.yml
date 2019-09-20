@@ -12,6 +12,6 @@ services:
       interval: 1m
       timeout: 10s
       retries: 5
-    accurev-client:
-      image: accurev-client
-      container_name: accurev-client
+  accurev-client:
+    image: accurev-client
+    container_name: accurev-client
