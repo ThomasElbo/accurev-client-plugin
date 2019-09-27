@@ -14,10 +14,17 @@ before_install:
 #  - docker cp . accurev-client:accurev-project/
 script:
 #  - docker exec -it accurev-client accurev-project/gradlew clean assemble check jacocoTestReport
-  - ./gradlew clean assemble check jacocoTestReport
+  - ./gradlew clean assemble check jacocoTestReport jpi
 after_success:
 #  - docker cp accurev-client:accuerv-project/build/jacoco build/jacoco
   - bash <(curl -s https://codecov.io/bash)
+
+deploy:
+  provider: releases
+  api_key: "$accurevclientdockerimage"
+  file: build/accurev-client.hpi
+  skip_cleanup: true
+  draft: true
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
