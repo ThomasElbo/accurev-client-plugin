@@ -22,7 +22,7 @@ after_success:
 deploy:
   provider: releases
   api_key: $api_key
-  file: build/accurev-client.hpi
+  file: $TRAVIS_BUILD_DIR/build/accurev-client.hpi
   skip_cleanup: true
   draft: true
 before_cache:
