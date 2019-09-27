@@ -21,7 +21,7 @@ after_success:
 
 deploy:
   provider: releases
-  github_token: $accurevclientdockerimage
+  github_token: $api_key
   file: build/accurev-client.hpi
   skip_cleanup: true
   draft: true
