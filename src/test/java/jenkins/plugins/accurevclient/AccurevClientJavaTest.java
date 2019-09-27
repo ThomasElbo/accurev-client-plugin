@@ -53,10 +53,10 @@ public class AccurevClientJavaTest {
     @Rule
     public TemporaryFolder temp = new TemporaryFolder();
 
-    @Rule
-    public DockerComposeRule docker = DockerComposeRule.builder()
-            .file("src/docker/docker-compose.yml")
-            .build();
+//    @Rule
+//    public DockerComposeRule docker = DockerComposeRule.builder()
+//            .file("src/docker/docker-compose.yml")
+//            .build();
 
     private static String url;
     private static String username;

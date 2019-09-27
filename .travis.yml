@@ -4,17 +4,19 @@ jdk:
 services:
   - docker
 before_install:
-  - sudo chown -R travis ./pull_client_image.sh
-  - sudo chmod +x ./pull_client_image.sh
-  - ./pull_client_image.sh
+#  - sudo chown -R travis ./pull_client_image.sh
+#  - sudo chmod +x ./pull_client_image.sh
+#  - ./pull_client_image.sh
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker pull wimill/accurev:latest
   - docker-compose -f ./src/docker/docker-compose.yml up -d
-  - docker exec -it accurev-client /tmp/accurev-7.3-linux-x64-clientonly.bin -i silent -f installer.properties
-  - docker cp . accurev-client:accurev-client/
+#  - docker exec -it accurev-client /tmp/accurev-7.3-linux-x64-clientonly.bin -i silent -f installer.properties
+#  - docker cp . accurev-client:accurev-project/
 script:
-  - docker exec -it accurev-client accurev-client/gradlew clean assemble check jacocoTestReport
+#  - docker exec -it accurev-client accurev-project/gradlew clean assemble check jacocoTestReport
+  - ./gradlew clean assemble check jacocoTestReport
 after_success:
+#  - docker cp accurev-client:accuerv-project/build/jacoco build/jacoco
   - bash <(curl -s https://codecov.io/bash)
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock

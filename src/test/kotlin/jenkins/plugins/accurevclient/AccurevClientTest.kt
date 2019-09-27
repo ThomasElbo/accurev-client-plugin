@@ -1,6 +1,5 @@
 package jenkins.plugins.accurevclient
 
-import com.palantir.docker.compose.DockerComposeRule
 import hudson.EnvVars
 import hudson.model.TaskListener
 import hudson.util.Secret
@@ -15,11 +14,11 @@ class AccurevClientTest {
     @Rule @JvmField
     val rule = JenkinsRule()
 
-    @Rule
-    @JvmField
-    var docker = DockerComposeRule.builder()
-            .file("src/docker/docker-compose.yml")
-            .build()!!
+//    @Rule
+//    @JvmField
+//    var docker = DockerComposeRule.builder()
+//            .file("src/docker/docker-compose.yml")
+//            .build()!!
 
     @Test
     fun loginCommand() {
