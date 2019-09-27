@@ -21,7 +21,7 @@ after_success:
 
 deploy:
   provider: releases
-  api_key: "$accurevclientdockerimage"
+  api_key: $accurevclientdockerimage
   file: build/accurev-client.hpi
   skip_cleanup: true
   draft: true
