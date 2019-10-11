@@ -1,8 +1,8 @@
-import groovy.lang.GroovyObject
+
 import org.jenkinsci.gradle.plugins.jpi.JpiDeveloper
 import org.jenkinsci.gradle.plugins.jpi.JpiLicense
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jfrog.gradle.plugin.artifactory.dsl.PublisherConfig
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val jvmVersion: Any? by project
 val jacocoVersion: Any? by project
@@ -23,6 +23,7 @@ plugins {
     `maven-publish`
     jacoco
     java
+    id("com.github.johnrengelman.shadow") version "4.0.4"
 }
 val spekVersion = "1.1.5"
 val junitPlatformVersion = "1.1.0"
@@ -34,7 +35,7 @@ dependencies {
     testCompile("ch.tutteli:atrium-verbs:$atriumVersion")
     testCompile("com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0-alpha02")
 
-    //jenkinsPlugins("org.jenkins-ci.plugins.kotlin:kotlin-v1-stdlib-jdk8:1.0-SNAPSHOT")
+    jenkinsPlugins("org.jenkins-ci.plugins.kotlin:kotlin-v1-stdlib-jdk8:1.2.60-1.3")
     jenkinsTest("org.jenkins-ci.main:jenkins-test-harness:$jenkinsTestHarnessVersion") { isTransitive = true }
     jenkinsPlugins(group = "org.jenkins-ci.plugins", name = "credentials", version = "2.1.18")
     jenkinsPlugins(group = "org.jenkins-ci.plugins", name = "credentials-binding", version = "1.18")
@@ -42,10 +43,10 @@ dependencies {
         exclude(group = "com.google.guava")
     }
     kapt("net.java.sezpoz:sezpoz:$sezpozVersion")
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.51")
-    compile("com.palantir.docker.compose:docker-compose-rule-junit4:0.36.3-rc1")
+    //compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.50")
+    testCompile("com.palantir.docker.compose:docker-compose-rule-junit4:0.36.3-rc1")
     testCompile("com.google.guava:guava:27.0.1-jre")
-    compile("com.google.guava:guava:27.0.1-jre")
+    //compile("com.google.guava:guava:27.0.1-jre")
 }
 
 jenkinsPlugin {
@@ -96,40 +97,40 @@ java {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
-artifactory {
-    setContextUrl("https://testartifactory.widex.io")
-    publish(delegateClosureOf<PublisherConfig> {
-        repository(delegateClosureOf<GroovyObject> {
-            setProperty("repoKey", "maven-playground")
-            setProperty("username", "tmel")
-            setProperty("password", "Lyn331sno28")
-            setProperty("maven", true)
-        })
-        defaults(delegateClosureOf<GroovyObject> {
-            invokeMethod("publications", "mavenJava")
-            setProperty("publishArtifacts", true)
-            setProperty("publishPom", true)
-        })
-    })
-}
+//artifactory {
+//    setContextUrl("https://testartifactory.widex.io")
+//    publish(delegateClosureOf<PublisherConfig> {
+//        repository(delegateClosureOf<GroovyObject> {
+//            setProperty("repoKey", "maven-playground")
+//            setProperty("username", "tmel")
+//            setProperty("password", "****")
+//            setProperty("maven", true)
+//        })
+//        defaults(delegateClosureOf<GroovyObject> {
+//            invokeMethod("publications", "mavenJava")
+//            setProperty("publishArtifacts", true)
+//            setProperty("publishPom", true)
+//        })
+//    })
+//}
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            groupId = "jenkins-plugins"
-            artifactId = "accurev-client"
-            version = "1.0.0-SNAPSHOT"
-
-            artifact("$buildDir/libs/accurev-client.hpi")
-            artifact("$buildDir/libs/accurev-client-plugin-1.0.0-SNAPSHOT.jar")
-
-            pom {
-                withXml {
-                }
-            }
-        }
-    }
-}
+//publishing {
+//    publications {
+//        create<MavenPublication>("mavenJava") {
+//            groupId = "jenkins-plugins"
+//            artifactId = "accurev-client"
+//            version = "1.0.0-SNAPSHOT"
+//
+//            artifact("$buildDir/libs/accurev-client.hpi")
+//            artifact("$buildDir/libs/accurev-client-plugin-1.0.0-SNAPSHOT.jar")
+//
+//            pom {
+//                withXml {
+//                }
+//            }
+//        }
+//    }
+//}
 
 tasks {
     withType<JacocoReport> {
@@ -147,6 +148,12 @@ tasks {
         testLogging.showStandardStreams = true
         testLogging.events("passed", "skipped", "failed")
         testLogging.setExceptionFormat("full")
+    }
+
+    withType<ShadowJar> {
+        dependencies {
+            include(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
+        }
     }
 }
 
@@ -174,8 +181,11 @@ buildscript {
         maven(url = "https://mvnrepository.com/artifact/com.google.guava/guava")
         jcenter()
     }
+    dependencies {
+        classpath ("com.github.jengelman.gradle.plugins:shadow:4.0.4")
+    }
 }
 
-configurations.all {
-    resolutionStrategy.force("com.google.guava:guava:27.0.1-jre" )
-}
+//configurations.all {
+//    resolutionStrategy.force("com.google.guava:guava:27.0.1-jre" )
+//}
