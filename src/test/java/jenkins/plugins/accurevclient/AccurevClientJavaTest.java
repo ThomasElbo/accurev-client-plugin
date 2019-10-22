@@ -114,7 +114,7 @@ public class AccurevClientJavaTest {
         f.createNewFile();
         List<String> files = new ArrayList<>();
         files.add(f.getName());
-        client.add().add(files).Comment("Initial").execute();
+        client.add().add(files).comment("Initial").execute();
         client.keep().comment("Initial").files(files).execute();
         client.promote().files(files).comment("Initial promote").execute();
 
