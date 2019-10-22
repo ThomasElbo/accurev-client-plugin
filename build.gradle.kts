@@ -46,6 +46,7 @@ dependencies {
     //compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.50")
     testCompile("com.palantir.docker.compose:docker-compose-rule-junit4:0.36.3-rc1")
     testCompile("com.google.guava:guava:27.0.1-jre")
+
     //compile("com.google.guava:guava:27.0.1-jre")
 }
 
@@ -75,6 +76,12 @@ jenkinsPlugin {
         license(delegateClosureOf<JpiLicense> {
             setProperty("url", "https://jenkins.io/license/")
         })
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("com.google.guava:guava:27.0.1-jre")
     }
 }
 

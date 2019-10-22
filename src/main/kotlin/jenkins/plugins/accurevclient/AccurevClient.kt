@@ -6,6 +6,7 @@ import com.cloudbees.plugins.credentials.CredentialsMatchers
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
 import jenkins.plugins.accurevclient.commands.HistCommand
 import jenkins.plugins.accurevclient.commands.LoginCommand
+import jenkins.plugins.accurevclient.commands.LogoutCommand
 import jenkins.plugins.accurevclient.commands.StreamCommand
 import jenkins.plugins.accurevclient.commands.UpdateCommand
 import jenkins.plugins.accurevclient.commands.PopulateCommand
@@ -16,7 +17,6 @@ import jenkins.plugins.accurevclient.commands.PromoteCommand
 import jenkins.plugins.accurevclient.commands.FilesCommand
 import jenkins.plugins.accurevclient.commands.AddCommand
 import jenkins.plugins.accurevclient.commands.ChangeWSCommand
-import jenkins.plugins.accurevclient.commands.LogoutCommand
 import jenkins.plugins.accurevclient.model.AccurevWorkspaces
 import jenkins.plugins.accurevclient.model.AccurevReferenceTrees
 import jenkins.plugins.accurevclient.model.AccurevDepots
@@ -108,5 +108,6 @@ interface AccurevClient {
     fun fetchDepotTransactionHistory(depot: String, timeSpecLower: String, timeSpecUpper: String, types: Collection<String>): AccurevTransactions
 
     fun getNDepthChildStreams(depot: String, stream: String, depth: Long): Collection<AccurevStream>
+
     fun resetCaches(): Boolean
 }

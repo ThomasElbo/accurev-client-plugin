@@ -1,0 +1,22 @@
+version: "3.3"
+services:
+  accurev:
+    image: wimill/accurev
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    ports:
+      - "5050:5050"
+    healthcheck:
+      test: ./accurev/bin/accurev info
+      interval: 1m
+      timeout: 10s
+      retries: 5
+  accurev2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ACCUREV_USER: accurev_otherUser
+    ports:
+      - "5051:5050"

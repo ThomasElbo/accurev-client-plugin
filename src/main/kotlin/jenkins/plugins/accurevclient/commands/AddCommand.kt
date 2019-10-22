@@ -1,7 +1,7 @@
 package jenkins.plugins.accurevclient.commands
 
 interface AddCommand : AccurevCommand {
-    fun Add(files: List<String>): AddCommand
+    fun add(files: List<String>): AddCommand
 
-    fun Comment(comment: String): AddCommand
+    fun comment(comment: String): AddCommand
 }

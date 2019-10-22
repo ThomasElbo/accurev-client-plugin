@@ -21,6 +21,10 @@ data class AccurevInfo(
     @field:XmlAttribute
     val workspace: String? = null,
     @field:XmlAttribute
+    val serverName: String? = null,
+    @field:XmlAttribute
+    val serverPort: Int? = null,
+    @field:XmlAttribute
     val depot: String? = null,
     @field:XmlAttribute
     val backingStream: String? = null,

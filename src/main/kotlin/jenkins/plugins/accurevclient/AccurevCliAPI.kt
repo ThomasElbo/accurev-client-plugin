@@ -132,12 +132,12 @@ class AccurevCliAPI(
         return object : AddCommand {
             private val args = accurev("add", false)
 
-            override fun Add(files: List<String>): AddCommand {
+            override fun add(files: List<String>): AddCommand {
                 files.forEach { args.add(it) }
                 return this
             }
 
-            override fun Comment(comment: String): AddCommand {
+            override fun comment(comment: String): AddCommand {
                 args.add("-c", comment)
                 return this
             }
@@ -593,7 +593,7 @@ class AccurevCliAPI(
 
     override fun logout(): LogoutCommand {
         return object : LogoutCommand {
-            private val args = accurev("logo")
+            private val args = accurev("logout")
             override fun execute(): String {
                 return launchCommand(args)
             }
