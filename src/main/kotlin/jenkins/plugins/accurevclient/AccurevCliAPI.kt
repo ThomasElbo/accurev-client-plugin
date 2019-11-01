@@ -35,7 +35,7 @@ import jenkins.plugins.accurevclient.model.AccurevUpdate
 import jenkins.plugins.accurevclient.model.AccurevFiles
 import jenkins.plugins.accurevclient.model.AccurevFile
 import jenkins.plugins.accurevclient.model.AccurevStreamType
-
+import jenkins.model.Jenkins
 import jenkins.plugins.accurevclient.utils.defaultCharset
 import jenkins.plugins.accurevclient.utils.isNotEmpty
 import jenkins.plugins.accurevclient.utils.rootPath
@@ -54,15 +54,15 @@ class AccurevCliAPI(
         private val environment: EnvVars = EnvVars(),
         val accurevExe: String,
         val server: String,
+        @Transient val launcher: Launcher? = LocalLauncher(TaskListener.NULL),
         @Transient private val listener: TaskListener
 ) : AccurevClient {
-    @Transient private val launcher: Launcher
 
     override var credentials: StandardUsernamePasswordCredentials? = null
 
+
     init {
-        environment.putIfAbsent("ACCUREV_HOME", workspace?.rootPath())
-        launcher = LocalLauncher(if (AccurevClient.verbose) listener else TaskListener.NULL)
+        environment.putIfAbsent("ACCUREV_HOME", workspace!!.remote)
     }
 
     fun accurev(cmd: String, xml: Boolean = false, appendServer: Boolean = true) = ArgumentListBuilder().apply {
@@ -245,7 +245,7 @@ class AccurevCliAPI(
 
     override fun populate(): PopulateCommand {
         return object : PopulateCommand {
-            val args = accurev("pop").add("-L", workspace?.remote)
+            val args = accurev("pop").add("-L", workspace!!.remote)
             var shallow = false
 
             override fun stream(stream: String): PopulateCommand {
@@ -578,7 +578,7 @@ class AccurevCliAPI(
                 when {
                     password.isNotEmpty() -> args.addMasked(password)
                     // Workaround for https://issues.jenkins-ci.org/browse/JENKINS-39066
-                    launcher.isUnix -> args.add("", true)
+                    launcher!!.isUnix -> args.add("", true)
                     else -> args.addQuoted("", true)
                 }
                 return this
@@ -613,7 +613,7 @@ class AccurevCliAPI(
         val environment = EnvVars(env)
         val command = args.toString()
 
-        val p = launcher.launch().apply {
+        val p = launcher!!.launch().apply {
             cmds(args)
             envs(environment)
             stdout(fos)
