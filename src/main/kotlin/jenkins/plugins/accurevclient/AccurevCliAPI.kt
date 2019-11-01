@@ -35,10 +35,8 @@ import jenkins.plugins.accurevclient.model.AccurevUpdate
 import jenkins.plugins.accurevclient.model.AccurevFiles
 import jenkins.plugins.accurevclient.model.AccurevFile
 import jenkins.plugins.accurevclient.model.AccurevStreamType
-import jenkins.model.Jenkins
 import jenkins.plugins.accurevclient.utils.defaultCharset
 import jenkins.plugins.accurevclient.utils.isNotEmpty
-import jenkins.plugins.accurevclient.utils.rootPath
 import jenkins.plugins.accurevclient.utils.unmarshal
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -59,7 +57,6 @@ class AccurevCliAPI(
 ) : AccurevClient {
 
     override var credentials: StandardUsernamePasswordCredentials? = null
-
 
     init {
         environment.putIfAbsent("ACCUREV_HOME", workspace!!.remote)

@@ -4,7 +4,6 @@ import hudson.EnvVars
 import hudson.FilePath
 import hudson.Launcher
 import hudson.model.TaskListener
-import hudson.remoting.LocalChannel
 import jenkins.model.Jenkins
 import java.io.File
 import java.io.Serializable
