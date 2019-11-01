@@ -2,6 +2,7 @@ package jenkins.plugins.accurevclient;
 
 import com.palantir.docker.compose.DockerComposeRule;
 import hudson.EnvVars;
+import hudson.Launcher;
 import hudson.model.TaskListener;
 import hudson.util.Secret;
 import org.apache.commons.lang.StringUtils;
@@ -52,7 +53,7 @@ public class MultipleRepositoriesTest {
 
     @Before
     public void setup() throws IOException, InterruptedException {
-        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
+        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars(), new Launcher.LocalLauncher(TaskListener.NULL))
                 .at(temp.getRoot()).on(url);
         client = accurev.getClient();
         client.login().username(username).password(Secret.fromString(password)).execute();
@@ -65,7 +66,7 @@ public class MultipleRepositoriesTest {
         assertTrue(client.getInfo().getLoggedIn());
         assertEquals(url, client.getInfo().getServerName() + ":" + client.getInfo().getServerPort());
         url = "localhost:5051";
-        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
+        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars(), new Launcher.LocalLauncher(TaskListener.NULL))
                 .at(temp.getRoot()).on(url);
         AccurevClient client1 = accurev.getClient();
         client1.logout();

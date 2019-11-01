@@ -2,6 +2,7 @@ package jenkins.plugins.accurevclient;
 
 import com.palantir.docker.compose.DockerComposeRule;
 import hudson.EnvVars;
+import hudson.Launcher;
 import hudson.model.FreeStyleProject;
 import hudson.model.TaskListener;
 import hudson.util.Secret;
@@ -81,7 +82,7 @@ public class AccurevClientJavaTest {
     @Before
     public void setup() throws IOException, InterruptedException {
         project = rule.createFreeStyleProject();
-        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars())
+        Accurev accurev = Accurev.with(TaskListener.NULL, new EnvVars(), new Launcher.LocalLauncher(TaskListener.NULL))
                 .at(project.getBuildDir()).on(url);
         client = accurev.getClient();
         client.login().username(username).password(Secret.fromString(password)).execute();

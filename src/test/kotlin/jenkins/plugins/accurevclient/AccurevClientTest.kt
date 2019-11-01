@@ -1,6 +1,7 @@
 package jenkins.plugins.accurevclient
 
 import hudson.EnvVars
+import hudson.Launcher
 import hudson.model.TaskListener
 import hudson.util.Secret
 import junit.framework.Assert.assertTrue
@@ -33,7 +34,7 @@ class AccurevClientTest {
                                         password.isNotEmpty()
         )
         val project = rule.createFreeStyleProject()
-        val accurev = Accurev.with(TaskListener.NULL, EnvVars())
+        val accurev = Accurev.with(TaskListener.NULL, EnvVars(), Launcher.LocalLauncher(TaskListener.NULL))
                         .at(project.buildDir).on(url)
         val client = accurev.client
         with(client.login()) {

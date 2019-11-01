@@ -39,6 +39,6 @@ data class Accurev(
 
     companion object {
         @JvmStatic
-        fun with(listener: TaskListener, env: EnvVars, launcher: Launcher) = Accurev(listener = listener, env = env, workspace = null, launcher = launcher)
+        fun with(listener: TaskListener, env: EnvVars, launcher: Launcher?) = Accurev(listener = listener, env = env, workspace = null, launcher = launcher)
     }
 }

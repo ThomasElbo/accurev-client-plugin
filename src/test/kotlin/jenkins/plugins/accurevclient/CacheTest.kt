@@ -2,6 +2,7 @@ package jenkins.plugins.accurevclient
 
 import ch.tutteli.atrium.verbs.assertthat.assertThat
 import hudson.EnvVars
+import hudson.Launcher
 import hudson.model.TaskListener
 import hudson.util.Secret
 import junit.framework.Assert.assertEquals
@@ -40,7 +41,7 @@ class CacheTest {
         )
         System.err.println("Creating project")
         val project = rule.createFreeStyleProject()
-        val accurev = Accurev.with(TaskListener.NULL, EnvVars())
+        val accurev = Accurev.with(TaskListener.NULL, EnvVars(), Launcher.LocalLauncher(TaskListener.NULL))
                 .at(project.buildDir).on(url)
         val client = accurev.client
         client.login().username(username).password(Secret.fromString(password)).execute()
