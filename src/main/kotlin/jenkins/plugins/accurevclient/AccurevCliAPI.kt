@@ -534,7 +534,7 @@ class AccurevCliAPI(
             s = this.fetchStream(depot, s.parent?.name ?: "")
         }
 
-        return (updates.sortedByDescending { x -> x.id }).toMutableList()
+        return updates.toMutableList()
     }
 
     override fun syncTime() {
