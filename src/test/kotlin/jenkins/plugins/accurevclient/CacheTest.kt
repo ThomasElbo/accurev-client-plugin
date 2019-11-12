@@ -19,10 +19,6 @@ import org.jvnet.hudson.test.JenkinsRule
 
 class CacheTest {
 
-//    @Rule @JvmField
-//    val docker = DockerComposeRule.builder()
-//            .file("src/docker/docker-compose.yml")
-//            .build()!!
     @Rule
     @JvmField
     val rule = JenkinsRule()
