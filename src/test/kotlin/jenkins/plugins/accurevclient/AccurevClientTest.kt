@@ -1,5 +1,6 @@
 package jenkins.plugins.accurevclient
 
+import com.palantir.docker.compose.DockerComposeRule
 import hudson.EnvVars
 import hudson.Launcher
 import hudson.model.TaskListener
@@ -34,8 +35,9 @@ class AccurevClientTest {
                                         password.isNotEmpty()
         )
         val project = rule.createFreeStyleProject()
-        val accurev = Accurev.with(TaskListener.NULL, EnvVars(), Launcher.LocalLauncher(TaskListener.NULL))
-                        .at(project.buildDir).on(url)
+        val j = rule.instance.rootPath;
+        val accurev = Accurev.with(TaskListener.NULL, EnvVars(), Launcher.LocalLauncher(TaskListener.NULL)).on(url);
+                        //.at(project.buildDir).on(url)
         val client = accurev.client
         with(client.login()) {
             username(username)

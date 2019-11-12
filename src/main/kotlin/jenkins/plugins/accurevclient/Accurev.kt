@@ -9,7 +9,7 @@ import java.io.File
 import java.io.Serializable
 
 data class Accurev(
-        @Transient var workspace: FilePath? = Jenkins.getInstanceOrNull()!!.rootPath,
+        @Transient var workspace: FilePath? = Jenkins.getInstance()!!.rootPath,
         var url: String = "",
         var exe: String = "accurev",
         val env: EnvVars = EnvVars(),
@@ -39,6 +39,6 @@ data class Accurev(
 
     companion object {
         @JvmStatic
-        fun with(listener: TaskListener, env: EnvVars, launcher: Launcher?) = Accurev(listener = listener, env = env, workspace = null, launcher = launcher)
+        fun with(listener: TaskListener, env: EnvVars, launcher: Launcher?) = Accurev(listener = listener, env = env, launcher = launcher)
     }
 }
