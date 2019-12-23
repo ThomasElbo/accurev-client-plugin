@@ -648,6 +648,5 @@ class AccurevCliAPI(
         @Transient private val cachedAccurevReferenceTrees: Cache<String, AccurevReferenceTrees> = Cache(3, TimeUnit.HOURS)
         @Transient private val cachedAccurevFiles: Cache<String, AccurevFiles> = Cache(3, TimeUnit.HOURS)
     }
-
     private fun ArgumentListBuilder.launch(): String = this@AccurevCliAPI.launchCommand(this)
 }
