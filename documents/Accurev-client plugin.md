@@ -1,10 +1,3 @@
----
-tags: [ToDo]
-title: Accurev-client plugin
-created: '2020-01-07T13:46:40.854Z'
-modified: '2020-01-07T14:07:14.688Z'
----
-
 # Accurev-client plugin
 
 The accurev client is build with Gradle and done in Kotlin. 
