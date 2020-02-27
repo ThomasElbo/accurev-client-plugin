@@ -5,12 +5,8 @@ jdk:
 services:
   - docker
 before_install:
-#  - sudo chown -R travis ./pull_client_image.sh
-#  - sudo chmod +x ./pull_client_image.sh
-#  - ./pull_client_image.sh
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker pull ehhnwidex/accurev:latest
-  - docker-compose -f ./src/docker/docker-compose.yml up -d
 
 script:
   - ./gradlew clean spotlessApply assemble check jacocoTestReport jpi shadowJar
