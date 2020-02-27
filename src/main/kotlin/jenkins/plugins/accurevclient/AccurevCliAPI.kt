@@ -104,6 +104,14 @@ class AccurevCliAPI(
                 return this
             }
 
+            override fun create(name: String, backingStream: String, isGated: Boolean): StreamCommand {
+                args.add("-s", name)
+                args.add("-b", backingStream)
+                if (isGated)
+                    args.add("--gated")
+                return this
+            }
+
             override fun execute(): String {
                 return launchCommand(args)
             }

@@ -9,15 +9,12 @@ before_install:
 #  - sudo chmod +x ./pull_client_image.sh
 #  - ./pull_client_image.sh
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker pull wimill/accurev:latest
+  - docker pull ehhnwidex/accurev:latest
   - docker-compose -f ./src/docker/docker-compose.yml up -d
-#  - docker exec -it accurev-client /tmp/accurev-7.3-linux-x64-clientonly.bin -i silent -f installer.properties
-#  - docker cp . accurev-client:accurev-project/
+
 script:
-#  - docker exec -it accurev-client accurev-project/gradlew clean assemble check jacocoTestReport
   - ./gradlew clean spotlessApply assemble check jacocoTestReport jpi shadowJar
 after_success:
-#  - docker cp accurev-client:accuerv-project/build/jacoco build/jacoco
   - bash <(curl -s https://codecov.io/bash)
 
 deploy:

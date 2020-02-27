@@ -1,6 +1,7 @@
 package jenkins.plugins.accurevclient
 
 import ch.tutteli.atrium.verbs.assertthat.assertThat
+import com.palantir.docker.compose.DockerComposeRule
 import hudson.EnvVars
 import hudson.Launcher
 import hudson.model.TaskListener
@@ -22,6 +23,12 @@ class CacheTest {
     @Rule
     @JvmField
     val rule = JenkinsRule()
+
+    @Rule
+    @JvmField
+    var docker = DockerComposeRule.builder()
+            .file("src/docker/docker-compose.yml")
+            .build()!!
 
     @Test
     fun testCacheServerValidation() {

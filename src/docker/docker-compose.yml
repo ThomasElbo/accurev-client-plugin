@@ -1,10 +1,7 @@
 version: "3.3"
 services:
   accurev:
-    image: wimill/accurev
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile
+    image: ehhnwidex/accurev
     ports:
       - "5050:5050"
     healthcheck:
@@ -12,8 +9,3 @@ services:
       interval: 1m
       timeout: 10s
       retries: 5
-  #accurev-client:
-  #  image: accurev-client
-  #  container_name: accurev-client
-  #  environment:
-  #    - _ACCUREV_URL=accurev
