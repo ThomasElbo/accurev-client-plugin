@@ -6,7 +6,12 @@ import hudson.Launcher;
 import hudson.model.FreeStyleProject;
 import hudson.model.TaskListener;
 import hudson.util.Secret;
-import jenkins.plugins.accurevclient.model.*;
+import jenkins.plugins.accurevclient.model.AccurevFiles;
+import jenkins.plugins.accurevclient.model.AccurevStream;
+import jenkins.plugins.accurevclient.model.AccurevStreams;
+import jenkins.plugins.accurevclient.model.AccurevTransaction;
+import jenkins.plugins.accurevclient.model.AccurevWorkspace;
+import jenkins.plugins.accurevclient.model.AccurevWorkspaces;
 import kotlin.jvm.JvmField;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.Matchers;
@@ -37,7 +42,8 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 
 import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assume.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
