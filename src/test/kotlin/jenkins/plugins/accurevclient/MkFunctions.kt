@@ -25,6 +25,17 @@ class MkFunctions(client: AccurevClient) {
     }
 
     @Throws(Exception::class)
+    fun mkgate(depot: String): String {
+        val gate = generateString(10)
+        val execute = client.stream().create(gate, depot, true).execute()
+        assertTrue(execute.contains(gate))
+
+        val streamExists = client.hist().stream(gate).depot(depot).execute()
+        assertTrue(streamExists.contains(gate))
+        return gate
+    }
+
+    @Throws(Exception::class)
     fun mkWorkspace(stream: String): String {
         val workspace = generateString(10)
         client.workspace().create(workspace, stream).execute()

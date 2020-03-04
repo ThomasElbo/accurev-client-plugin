@@ -44,4 +44,58 @@ class AccurevClientTest {
         }
         assertTrue(client.getInfo().loggedIn)
     }
+
+    @Test
+    fun mkStreamCommand(){
+        System.err.println("Running login test")
+        val url = System.getenv("_ACCUREV_URL") ?: "localhost:5050"
+        val username = System.getenv("_ACCUREV_USERNAME") ?: "accurev_user"
+        val password = System.getenv("_ACCUREV_PASSWORD") ?: "docker"
+        assumeTrue("Can only run test with proper test setup",
+                "accurev".checkCommandExist() &&
+                        url.isNotBlank() &&
+                        username.isNotBlank() &&
+                        password.isNotEmpty()
+        )
+        val accurev = Accurev.with(TaskListener.NULL, EnvVars(), Launcher.LocalLauncher(TaskListener.NULL)).on(url)
+        val client = accurev.client
+
+        with(client.login()) {
+            username(username)
+            password(Secret.fromString(password))
+            execute()
+        }
+
+        val create = MkFunctions(client)
+
+        val depot = create.mkDepot();
+        val stream = create.mkStream(depot)
+    }
+
+    @Test
+    fun mkGatedSteamCommand(){
+        System.err.println("Running login test")
+        val url = System.getenv("_ACCUREV_URL") ?: "localhost:5050"
+        val username = System.getenv("_ACCUREV_USERNAME") ?: "accurev_user"
+        val password = System.getenv("_ACCUREV_PASSWORD") ?: "docker"
+        assumeTrue("Can only run test with proper test setup",
+                "accurev".checkCommandExist() &&
+                        url.isNotBlank() &&
+                        username.isNotBlank() &&
+                        password.isNotEmpty()
+        )
+        val accurev = Accurev.with(TaskListener.NULL, EnvVars(), Launcher.LocalLauncher(TaskListener.NULL)).on(url)
+        val client = accurev.client
+
+        with(client.login()) {
+            username(username)
+            password(Secret.fromString(password))
+            execute()
+        }
+
+        val create = MkFunctions(client)
+
+        val depot = create.mkDepot();
+        val stream = create.mkgate(depot)
+    }
 }

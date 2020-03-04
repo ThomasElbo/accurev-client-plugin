@@ -6,12 +6,7 @@ import hudson.Launcher;
 import hudson.model.FreeStyleProject;
 import hudson.model.TaskListener;
 import hudson.util.Secret;
-import jenkins.plugins.accurevclient.model.AccurevFiles;
-import jenkins.plugins.accurevclient.model.AccurevStream;
-import jenkins.plugins.accurevclient.model.AccurevStreams;
-import jenkins.plugins.accurevclient.model.AccurevTransaction;
-import jenkins.plugins.accurevclient.model.AccurevWorkspace;
-import jenkins.plugins.accurevclient.model.AccurevWorkspaces;
+import jenkins.plugins.accurevclient.model.*;
 import kotlin.jvm.JvmField;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.Matchers;
@@ -42,8 +37,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 
 import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -315,6 +309,35 @@ public class AccurevClientJavaTest {
 
 
 
+    }
+
+    @Test public void getActiveElements() throws Exception {
+        String depotName = mkDepot(client);
+        String streamD1 = mkStream(depotName, client);
+        /**
+         *  depotName
+         *      - streamD1
+         *          - streamD2
+         */
+        mkWorkspace(streamD1, client);
+        File f = new File(project.getBuildDir() + "/file");
+        f.createNewFile();
+        List<String> files = new ArrayList<>();
+        files.add(f.getName());
+        client.add().add(files).execute();
+        client.keep().files(files).comment("").execute();
+        client.promote().files(files).comment("file to depotStream").execute();
+        assertEquals(client.getActiveTransactions(depotName).getFiles().size(),0);
+        assertEquals(client.getActiveTransactions(streamD1).getFiles().size(),1);
+
+        f = new File(project.getBuildDir() + "/file2");
+        f.createNewFile();
+        files = new ArrayList<>();
+        files.add(f.getName());
+        client.add().add(files).execute();
+        client.keep().files(files).comment("").execute();
+        client.promote().files(files).comment("file to depotStream").execute();
+        assertEquals(client.getActiveTransactions(streamD1).getFiles().size(),2);
     }
 
 

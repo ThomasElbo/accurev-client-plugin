@@ -9,19 +9,7 @@ import hudson.Launcher.LocalLauncher
 import hudson.model.TaskListener
 import hudson.util.ArgumentListBuilder
 import hudson.util.Secret
-import jenkins.plugins.accurevclient.commands.HistCommand
-import jenkins.plugins.accurevclient.commands.LoginCommand
-import jenkins.plugins.accurevclient.commands.LogoutCommand
-import jenkins.plugins.accurevclient.commands.StreamCommand
-import jenkins.plugins.accurevclient.commands.UpdateCommand
-import jenkins.plugins.accurevclient.commands.PopulateCommand
-import jenkins.plugins.accurevclient.commands.KeepCommand
-import jenkins.plugins.accurevclient.commands.DepotCommand
-import jenkins.plugins.accurevclient.commands.WorkspaceCommand
-import jenkins.plugins.accurevclient.commands.PromoteCommand
-import jenkins.plugins.accurevclient.commands.FilesCommand
-import jenkins.plugins.accurevclient.commands.AddCommand
-import jenkins.plugins.accurevclient.commands.ChangeWSCommand
+import jenkins.plugins.accurevclient.commands.*
 import jenkins.plugins.accurevclient.model.AccurevWorkspaces
 import jenkins.plugins.accurevclient.model.AccurevReferenceTrees
 import jenkins.plugins.accurevclient.model.AccurevDepots
@@ -497,6 +485,13 @@ class AccurevCliAPI(
             return accurevTransactions
         }
     }
+
+    override fun getActiveElements(stream: String): AccurevFiles {
+        with(accurev("stat", true)){
+            return add("-d", "-s", stream ).launch().unmarshal() as AccurevFiles //range
+        }
+    }
+
 
     override fun fetchDepotTransactionHistory(depot: String, timeSpecLower: String, timeSpecUpper: String, types: Collection<String>): AccurevTransactions {
         with(accurev("hist", true)) {

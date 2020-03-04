@@ -4,19 +4,7 @@ import com.cloudbees.jenkins.plugins.sshcredentials.SSHUserPrivateKey
 import com.cloudbees.plugins.credentials.CredentialsMatcher
 import com.cloudbees.plugins.credentials.CredentialsMatchers
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials
-import jenkins.plugins.accurevclient.commands.HistCommand
-import jenkins.plugins.accurevclient.commands.LoginCommand
-import jenkins.plugins.accurevclient.commands.LogoutCommand
-import jenkins.plugins.accurevclient.commands.StreamCommand
-import jenkins.plugins.accurevclient.commands.UpdateCommand
-import jenkins.plugins.accurevclient.commands.PopulateCommand
-import jenkins.plugins.accurevclient.commands.KeepCommand
-import jenkins.plugins.accurevclient.commands.DepotCommand
-import jenkins.plugins.accurevclient.commands.WorkspaceCommand
-import jenkins.plugins.accurevclient.commands.PromoteCommand
-import jenkins.plugins.accurevclient.commands.FilesCommand
-import jenkins.plugins.accurevclient.commands.AddCommand
-import jenkins.plugins.accurevclient.commands.ChangeWSCommand
+import jenkins.plugins.accurevclient.commands.*
 import jenkins.plugins.accurevclient.model.AccurevWorkspaces
 import jenkins.plugins.accurevclient.model.AccurevReferenceTrees
 import jenkins.plugins.accurevclient.model.AccurevDepots
@@ -70,6 +58,8 @@ interface AccurevClient {
     fun getDepots(): AccurevDepots
 
     fun getStreams(depot: String = ""): AccurevStreams
+
+    fun getActiveElements(stream: String = ""): AccurevFiles
 
     fun fetchDepot(depot: String): AccurevDepot?
 
