@@ -337,7 +337,7 @@ public class AccurevClientJavaTest {
         client.add().add(files).execute();
         client.keep().files(files).comment("").execute();
         client.promote().files(files).comment("file to depotStream").execute();
-        assertEquals(client.getActiveTransactions(streamD1).getFiles().size(),2);
+        assertEquals(client.getActiveElements(streamD1).getFiles().size(),2);
     }
 
 
