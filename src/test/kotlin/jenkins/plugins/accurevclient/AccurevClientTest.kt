@@ -46,7 +46,7 @@ class AccurevClientTest {
     }
 
     @Test
-    fun mkStreamCommand(){
+    fun mkStreamCommand() {
         System.err.println("Running login test")
         val url = System.getenv("_ACCUREV_URL") ?: "localhost:5050"
         val username = System.getenv("_ACCUREV_USERNAME") ?: "accurev_user"
@@ -68,12 +68,12 @@ class AccurevClientTest {
 
         val create = MkFunctions(client)
 
-        val depot = create.mkDepot();
-        val stream = create.mkStream(depot)
+        val depot = create.mkDepot()
+        create.mkStream(depot)
     }
 
     @Test
-    fun mkGatedSteamCommand(){
+    fun mkGatedSteamCommand() {
         System.err.println("Running login test")
         val url = System.getenv("_ACCUREV_URL") ?: "localhost:5050"
         val username = System.getenv("_ACCUREV_USERNAME") ?: "accurev_user"
@@ -95,7 +95,7 @@ class AccurevClientTest {
 
         val create = MkFunctions(client)
 
-        val depot = create.mkDepot();
+        val depot = create.mkDepot()
         val stream = create.mkgate(depot)
     }
 }

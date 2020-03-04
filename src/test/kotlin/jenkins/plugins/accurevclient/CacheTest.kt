@@ -6,8 +6,8 @@ import hudson.EnvVars
 import hudson.Launcher
 import hudson.model.TaskListener
 import hudson.util.Secret
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertTrue
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo

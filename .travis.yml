@@ -16,6 +16,7 @@ after_success:
 deploy:
   provider: releases
   api_key: $api_key
+  file_glob: true
   file:
     - build/libs/accurev-client.hpi
     - build/libs/accurev-client-plugin-*-SNAPSHOT-all.jar

@@ -9,7 +9,7 @@ import java.io.File
 import java.io.Serializable
 
 data class Accurev(
-        @Transient var workspace: FilePath? = Jenkins.getInstance()!!.rootPath,
+        @Transient var workspace: FilePath? = Jenkins.getInstanceOrNull()!!.rootPath,
         var url: String = "",
         var exe: String = "accurev",
         val env: EnvVars = EnvVars(),

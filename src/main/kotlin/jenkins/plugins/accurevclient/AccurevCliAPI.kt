@@ -478,7 +478,7 @@ class AccurevCliAPI(
                 val stream = streams.list.firstOrNull { x -> x.name == item }
                 if (stream != null) {
                     if (stream.children.isNotEmpty()) {
-                        temp.addAll(stream!!.children)
+                        temp.addAll(stream.children)
                         childStreams.addAll(stream!!.children)
                     }
                 }
@@ -499,11 +499,10 @@ class AccurevCliAPI(
     }
 
     override fun getActiveElements(stream: String): AccurevFiles {
-        with(accurev("stat", true)){
+        with(accurev("stat", true)) {
             return add("-d", "-s", stream ).launch().unmarshal() as AccurevFiles //range
         }
     }
-
 
     override fun fetchDepotTransactionHistory(depot: String, timeSpecLower: String, timeSpecUpper: String, types: Collection<String>): AccurevTransactions {
         with(accurev("hist", true)) {
