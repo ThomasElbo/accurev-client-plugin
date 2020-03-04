@@ -327,8 +327,8 @@ public class AccurevClientJavaTest {
         client.add().add(files).execute();
         client.keep().files(files).comment("").execute();
         client.promote().files(files).comment("file to depotStream").execute();
-        assertEquals(client.getActiveTransactions(depotName).getFiles().size(),0);
-        assertEquals(client.getActiveTransactions(streamD1).getFiles().size(),1);
+        assertEquals(client.getActiveElements(depotName).getFiles().size(),0);
+        assertEquals(client.getActiveElements(streamD1).getFiles().size(),1);
 
         f = new File(project.getBuildDir() + "/file2");
         f.createNewFile();
