@@ -73,6 +73,8 @@ interface AccurevClient {
 
     fun getActiveElements(stream: String = ""): AccurevFiles
 
+    fun getActiveTransactions(stream: String = ""): AccurevTransactions
+
     fun fetchDepot(depot: String): AccurevDepot?
 
     fun fetchStream(depot: String, stream: String): AccurevStream?
@@ -80,6 +82,12 @@ interface AccurevClient {
     fun fetchTransaction(stream: String): AccurevTransaction
 
     fun fetchTransaction(stream: AccurevStream): AccurevTransaction
+
+    fun fetchTransaction(stream: String, transaction: Long): AccurevTransaction
+
+    fun fetchTransaction(stream: AccurevStream, transaction: Long): AccurevTransaction
+
+    fun fetchTransaction(stream: AccurevStream, transaction: AccurevTransaction): AccurevTransaction
 
     fun getChildStreams(depot: String, stream: String): AccurevStreams
 
@@ -98,7 +106,7 @@ interface AccurevClient {
 
     companion object {
         val verbose = java.lang.Boolean.getBoolean("${AccurevClient::class.java.name}.verbose")
-        val CREDENTIALS_MATCHER: CredentialsMatcher = CredentialsMatchers.anyOf(CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials::class.java), CredentialsMatchers.instanceOf(SSHUserPrivateKey::class.java!!))
+        val CREDENTIALS_MATCHER: CredentialsMatcher = CredentialsMatchers.anyOf(CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials::class.java), CredentialsMatchers.instanceOf(SSHUserPrivateKey::class.java))
     }
 
     fun getFile(stream: String, path: String, transaction: String = "highest"): String

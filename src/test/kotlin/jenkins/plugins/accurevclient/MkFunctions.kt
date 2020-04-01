@@ -1,6 +1,6 @@
 package jenkins.plugins.accurevclient
 
-import junit.framework.Assert.assertTrue
+import org.junit.Assert.assertTrue
 
 class MkFunctions(client: AccurevClient) {
 

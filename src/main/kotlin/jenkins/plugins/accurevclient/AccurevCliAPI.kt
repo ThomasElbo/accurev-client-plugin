@@ -442,8 +442,24 @@ class AccurevCliAPI(
         }
     }
 
+    override fun fetchTransaction(stream: String, transaction: Long): AccurevTransaction {
+        with(accurev("hist",true)){
+            var accurevTransaction = add("-t", transaction.toString(),"-s", stream).launch().unmarshal() as AccurevTransactions
+            accurevTransaction.transactions[0].stream = stream
+            return accurevTransaction.transactions[0]
+        }
+    }
+
     override fun fetchTransaction(stream: AccurevStream): AccurevTransaction {
         return fetchTransaction(stream.name)
+    }
+
+    override fun fetchTransaction(stream: AccurevStream, transaction: Long): AccurevTransaction {
+        return fetchTransaction(stream.name, transaction)
+    }
+
+    override fun fetchTransaction(stream: AccurevStream, transaction: AccurevTransaction): AccurevTransaction {
+        return fetchTransaction(stream.name, transaction.id)
     }
 
     override fun getChildStreams(depot: String, stream: String): AccurevStreams {
@@ -479,7 +495,7 @@ class AccurevCliAPI(
                 if (stream != null) {
                     if (stream.children.isNotEmpty()) {
                         temp.addAll(stream.children)
-                        childStreams.addAll(stream!!.children)
+                        childStreams.addAll(stream.children)
                     }
                 }
             }
@@ -501,6 +517,17 @@ class AccurevCliAPI(
     override fun getActiveElements(stream: String): AccurevFiles {
         with(accurev("stat", true)) {
             return add("-d", "-s", stream ).launch().unmarshal() as AccurevFiles //range
+        }
+    }
+
+    override fun getActiveTransactions(stream: String): AccurevTransactions {
+        with(accurev("translist", true)) {
+            val accurevTransactions = add("-s", stream).launch().unmarshal() as AccurevTransactions // Range
+            for (i:Int in 0 until accurevTransactions.transactions.size){
+                accurevTransactions.transactions[i] = fetchTransaction(stream, accurevTransactions.transactions[i].id)
+            }
+            //accurevTransactions.transactions.forEach { transaction -> transaction = fetchTransaction(stream, transaction.id) }
+            return accurevTransactions
         }
     }
 
@@ -531,20 +558,16 @@ class AccurevCliAPI(
         var s = this.fetchStream(depot, stream)
         var ts = timeSpec
         var updates: MutableCollection<AccurevTransaction> = mutableListOf()
-
         while ( s != null ) {
             var listOfTransactions = fetchStreamTransactionHistory(s.name, (timeSpec + 1).toString())
 
-            if (!listOfTransactions.transactions.isEmpty()) {
+            if (listOfTransactions.transactions.isNotEmpty()) {
                 listOfTransactions.transactions.forEach { at -> if (at.id > ts) updates.add(at) }
             }
 
-            if (s != null) {
-                if (s.type == (AccurevStreamType.Snapshot) || ((s.time != null) && (s.time!!.before( Date(System.currentTimeMillis()))))) {
-                    break
-                }
+            if (s.type == (AccurevStreamType.Snapshot) || ((s.time != null) && (s.time!!.before( Date(System.currentTimeMillis()))))) {
+                break
             }
-
             s = this.fetchStream(depot, s.parent?.name ?: "")
         }
 

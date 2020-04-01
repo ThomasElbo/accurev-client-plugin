@@ -5,7 +5,7 @@ import hudson.EnvVars
 import hudson.Launcher
 import hudson.model.TaskListener
 import hudson.util.Secret
-import junit.framework.Assert.assertTrue
+import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test

@@ -69,12 +69,12 @@ public class AccurevClientJavaTest {
         url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
         username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "accurev_user";
         password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "docker";
-        assumeTrue("Can only run test with proper test setup",
-                AccurevTestUtils.checkCommandExist("accurev") &&
-                        StringUtils.isNotBlank(url) &&
-                        StringUtils.isNotBlank(username) &&
-                        StringUtils.isNotEmpty(password)
-        );
+//        assumeTrue("Can only run test with proper test setup",
+//                AccurevTestUtils.checkCommandExist("accurev") &&
+//                        StringUtils.isNotBlank(url) &&
+//                        StringUtils.isNotBlank(username) &&
+//                        StringUtils.isNotEmpty(password)
+//        );
     }
     private FreeStyleProject project;
     private AccurevClient client;
@@ -135,6 +135,8 @@ public class AccurevClientJavaTest {
         assertEquals(depotName, generatedStream.getDepotName());
         assertEquals(streamName, generatedStream.getName());
     }
+
+
 
     @Test public void getUpdatedParents() throws Exception {
         String depotName = mkDepot(client);
@@ -346,6 +348,33 @@ public class AccurevClientJavaTest {
         assertEquals(client.getActiveElements(streamD1).getFiles().size(),2);
     }
 
+    @Test public void getActiveTransactions()throws Exception{
+        String depotName = mkDepot(client);
+        String streamD1 = mkStream(depotName, client);
+        /**
+         *  depotName
+         *      - streamD1
+         */
+        mkWorkspace(streamD1, client);
+        assertEquals(client.getActiveTransactions(streamD1).getTransactions().size(),0);
+        File f = new File(project.getBuildDir() + "/file");
+        f.createNewFile();
+        List<String> files = new ArrayList<>();
+        files.add(f.getName());
+        client.add().add(files).execute();
+        client.keep().files(files).comment("").execute();
+        client.promote().files(files).comment("file to depotStream").execute();
+        assertEquals(client.getActiveTransactions(streamD1).getTransactions().size(),1);
+
+        f = new File(project.getBuildDir() + "/file2");
+        f.createNewFile();
+        files = new ArrayList<>();
+        files.add(f.getName());
+        client.add().add(files).execute();
+        client.keep().files(files).comment("").execute();
+        client.promote().files(files).comment("file to depotStream").execute();
+        assertEquals(client.getActiveTransactions(streamD1).getTransactions().size(),2);
+    }
 
     private String mkDepot(AccurevClient client) throws Exception {
         String depot = generateString(10);
