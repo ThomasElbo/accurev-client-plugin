@@ -443,8 +443,8 @@ class AccurevCliAPI(
     }
 
     override fun fetchTransaction(stream: String, transaction: Long): AccurevTransaction {
-        with(accurev("hist",true)){
-            var accurevTransaction = add("-t", transaction.toString(),"-s", stream).launch().unmarshal() as AccurevTransactions
+        with(accurev("hist", true)) {
+            var accurevTransaction = add("-t", transaction.toString(), "-s", stream).launch().unmarshal() as AccurevTransactions
             accurevTransaction.transactions[0].stream = stream
             return accurevTransaction.transactions[0]
         }
@@ -495,7 +495,7 @@ class AccurevCliAPI(
                 if (stream != null) {
                     if (stream.children.isNotEmpty()) {
                         temp.addAll(stream.children)
-                        childStreams.addAll(stream.children)
+                        childStreams.addAll(stream!!.children)
                     }
                 }
             }
@@ -523,7 +523,7 @@ class AccurevCliAPI(
     override fun getActiveTransactions(stream: String): AccurevTransactions {
         with(accurev("translist", true)) {
             val accurevTransactions = add("-s", stream).launch().unmarshal() as AccurevTransactions // Range
-            for (i:Int in 0 until accurevTransactions.transactions.size){
+            for (i: Int in 0 until accurevTransactions.transactions.size) {
                 accurevTransactions.transactions[i] = fetchTransaction(stream, accurevTransactions.transactions[i].id)
             }
             //accurevTransactions.transactions.forEach { transaction -> transaction = fetchTransaction(stream, transaction.id) }
