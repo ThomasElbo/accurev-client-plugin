@@ -69,12 +69,12 @@ public class AccurevClientJavaTest {
         url = System.getenv("_ACCUREV_URL") == "" ? System.getenv("_ACCUREV_URL") : "localhost:5050";
         username = System.getenv("_ACCUREV_USERNAME") != null ? System.getenv("_ACCUREV_URL") : "accurev_user";
         password = System.getenv("_ACCUREV_PASSWORD") != null ? System.getenv("_ACCUREV_URL") : "docker";
-//        assumeTrue("Can only run test with proper test setup",
-//                AccurevTestUtils.checkCommandExist("accurev") &&
-//                        StringUtils.isNotBlank(url) &&
-//                        StringUtils.isNotBlank(username) &&
-//                        StringUtils.isNotEmpty(password)
-//        );
+        assumeTrue("Can only run test with proper test setup",
+                AccurevTestUtils.checkCommandExist("accurev") &&
+                        StringUtils.isNotBlank(url) &&
+                        StringUtils.isNotBlank(username) &&
+                        StringUtils.isNotEmpty(password)
+        );
     }
     private FreeStyleProject project;
     private AccurevClient client;
