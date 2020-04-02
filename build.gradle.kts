@@ -21,6 +21,7 @@ plugins {
     id("com.diffplug.gradle.spotless") version "3.7.0"
     id("com.jfrog.artifactory") version "4.9.8"
     `maven-publish`
+    maven
     jacoco
     java
     id("com.github.johnrengelman.shadow") version "4.0.4"
