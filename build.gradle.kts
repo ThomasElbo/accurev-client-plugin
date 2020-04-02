@@ -171,9 +171,11 @@ task<Wrapper>("wrapper") {
 }
 
 repositories {
-    maven(url = "https://repo.jenkins-ci.org/public/")
-    maven(url = "https://dl.bintray.com/palantir/releases")
-    maven(url = "https://mvnrepository.com/artifact/com.google.guava/guava")
+    maven(url = "https://www.repo.jenkins-ci.org/public/")
+    maven(url = "https://www.dl.bintray.com/palantir/releases")
+    maven(url = "https://www.mvnrepository.com/artifact/com.google.guava/guava")
+    maven(url = "https://www.jitpack.io" )
+
     jcenter()
     mavenCentral()
 }
@@ -184,9 +186,11 @@ configurations.all { exclude(module = "junit-dep") }
 // Workaround for https://github.com/Kotlin/dokka/issues/146
 buildscript {
     repositories {
-        maven(url = "https://repo.jenkins-ci.org/public/")
-        maven(url = "https://dl.bintray.com/palantir/releases")
-        maven(url = "https://mvnrepository.com/artifact/com.google.guava/guava")
+        maven(url = "https://www.repo.jenkins-ci.org/public/")
+        maven(url = "https://www.dl.bintray.com/palantir/releases")
+        maven(url = "https://www.mvnrepository.com/artifact/com.google.guava/guava")
+        maven(url = "https://www.jitpack.io" )
+
         jcenter()
     }
     dependencies {
