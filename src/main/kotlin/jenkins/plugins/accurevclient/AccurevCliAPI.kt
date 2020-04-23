@@ -491,11 +491,11 @@ class AccurevCliAPI(
             val iterator = queue.iterator()
             val temp = mutableListOf<AccurevStream>()
             for (item in iterator) {
-                val stream = streams.list.firstOrNull { x -> x.name == item }
-                if (stream != null) {
-                    if (stream.children.isNotEmpty()) {
-                        temp.addAll(stream.children)
-                        childStreams.addAll(stream!!.children)
+                val Acstream = streams.list.firstOrNull { x -> x.name == item }
+                if (Acstream != null) {
+                    if (Acstream.children.isNotEmpty()) {
+                        temp.addAll(Acstream.children)
+                        childStreams.addAll(Acstream.children)
                     }
                 }
             }

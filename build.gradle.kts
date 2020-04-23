@@ -174,10 +174,10 @@ repositories {
     maven(url = "https://repo.jenkins-ci.org/public/")
     maven(url = "https://dl.bintray.com/palantir/releases")
     maven(url = "https://mvnrepository.com/artifact/com.google.guava/guava")
-    maven(url = "https://www.jitpack.io" )
-
     jcenter()
     mavenCentral()
+    maven(url = "https://www.jitpack.io" )
+
 }
 
 // Workaround for https://issues.jenkins-ci.org/browse/JENKINS-48353
@@ -189,8 +189,6 @@ buildscript {
         maven(url = "https://repo.jenkins-ci.org/public/")
         maven(url = "https://dl.bintray.com/palantir/releases")
         maven(url = "https://mvnrepository.com/artifact/com.google.guava/guava")
-        maven(url = "https://www.jitpack.io" )
-
         jcenter()
     }
     dependencies {

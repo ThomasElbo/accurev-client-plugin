@@ -96,6 +96,6 @@ class AccurevClientTest {
         val create = MkFunctions(client)
 
         val depot = create.mkDepot()
-        val stream = create.mkgate(depot)
+        create.mkgate(depot)
     }
 }
