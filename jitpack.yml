@@ -2,5 +2,5 @@ jdk:
   - openjdk8
 
 install:
-  - ./gradlew clean spotlessApply assemble check jacocoTestReport jpi shadowJar
+  - ./gradlew clean spotlessApply assemble check jacocoTestReport jpi shadowJar --stacktrace
 
