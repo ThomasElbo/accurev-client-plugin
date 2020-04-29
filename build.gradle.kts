@@ -172,16 +172,13 @@ task<Wrapper>("wrapper") {
 
 allprojects {
     repositories {
+        maven(url = "https://repo.jenkins-ci.org/public/")
+        maven(url = "https://dl.bintray.com/palantir/releases")
+        maven(url = "https://mvnrepository.com/artifact/com.google.guava/guava")
+        jcenter()
+        mavenCentral()
         maven(url = "https://jitpack.io")
     }
-}
-
-repositories {
-    maven(url = "https://repo.jenkins-ci.org/public/")
-    maven(url = "https://dl.bintray.com/palantir/releases")
-    maven(url = "https://mvnrepository.com/artifact/com.google.guava/guava")
-    jcenter()
-    mavenCentral()
 }
 
 // Workaround for https://issues.jenkins-ci.org/browse/JENKINS-48353
