@@ -4,6 +4,7 @@ import org.jenkinsci.gradle.plugins.jpi.JpiLicense
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
+
 val jvmVersion: Any? by project
 val jacocoVersion: Any? by project
 val ktlintVersion: Any? by project
@@ -19,9 +20,8 @@ plugins {
     id("org.jenkins-ci.jpi") version "0.28.1"
     id("org.jetbrains.dokka") version "0.9.18"
     id("com.diffplug.gradle.spotless") version "3.7.0"
-    id("com.jfrog.artifactory") version "4.9.8"
     `maven-publish`
-    maven
+    `maven`
     jacoco
     java
     id("com.github.johnrengelman.shadow") version "4.0.4"
@@ -105,41 +105,6 @@ java {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
-//artifactory {
-//    setContextUrl("https://testartifactory.widex.io")
-//    publish(delegateClosureOf<PublisherConfig> {
-//        repository(delegateClosureOf<GroovyObject> {
-//            setProperty("repoKey", "maven-playground")
-//            setProperty("username", "tmel")
-//            setProperty("password", "****")
-//            setProperty("maven", true)
-//        })
-//        defaults(delegateClosureOf<GroovyObject> {
-//            invokeMethod("publications", "mavenJava")
-//            setProperty("publishArtifacts", true)
-//            setProperty("publishPom", true)
-//        })
-//    })
-//}
-
-//publishing {
-//    publications {
-//        create<MavenPublication>("mavenJava") {
-//            groupId = "jenkins-plugins"
-//            artifactId = "accurev-client"
-//            version = "1.0.0-SNAPSHOT"
-//
-//            artifact("$buildDir/libs/accurev-client.hpi")
-//            artifact("$buildDir/libs/accurev-client-plugin-1.0.0-SNAPSHOT.jar")
-//
-//            pom {
-//                withXml {
-//                }
-//            }
-//        }
-//    }
-//}
-
 tasks {
     withType<JacocoReport> {
         reports {
@@ -194,6 +159,24 @@ buildscript {
     }
     dependencies {
         classpath ("com.github.jengelman.gradle.plugins:shadow:4.0.4")
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ehhnwidex/accurev-client-plugin")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("api_key")
+            }
+        }
+    }
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
     }
 }
 
