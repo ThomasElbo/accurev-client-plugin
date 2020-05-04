@@ -4,7 +4,6 @@ import org.jenkinsci.gradle.plugins.jpi.JpiLicense
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-
 val jvmVersion: Any? by project
 val jacocoVersion: Any? by project
 val ktlintVersion: Any? by project
