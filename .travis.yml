@@ -14,14 +14,16 @@ after_success:
   - bash <(curl -s https://codecov.io/bash)
 
 deploy:
-  provider: releases
-  api_key: $api_key
-  file_glob: true
-  file:
-    - build/libs/accurev-client.hpi
-    - build/libs/accurev-client-plugin-*-SNAPSHOT-all.jar
-  skip_cleanup: true
-  draft: true
+  - provider: releases
+    api_key: $api_key
+    file_glob: true
+    file:
+      - build/libs/accurev-client.hpi
+      - build/libs/accurev-client-plugin-*-SNAPSHOT-all.jar
+    skip_cleanup: true
+    draft: true
+  - provider: script
+    script: mvn deploy -Dregistry=https://maven.pkg.github.com/ehhnwidex -Dtoken=$api_key
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
