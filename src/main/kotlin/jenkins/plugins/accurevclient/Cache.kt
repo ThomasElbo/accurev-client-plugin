@@ -27,10 +27,9 @@ class Cache<K, V> @JvmOverloads constructor(duration: Int, unit: TimeUnit, maxEn
         val result: V
         val parts = key.toString().split(":")
         if (!types!!.isEmpty() && parts.size > 2) {
-            val updates = client!!.fetchDepotTransactionHistory(parts[3], lastUpdate.toString(), "now", types)
+            val updates = client!!.fetchDepotTransactionHistory(parts[3], (lastUpdate +1 ).toString(), "now", types)
             if (!updates.transactions.isEmpty()) {
                 try {
-
                     result = callable.call()
                 } catch (e: Exception) {
                         throw ExecutionException("Cannot load value for key: " + key, e)
