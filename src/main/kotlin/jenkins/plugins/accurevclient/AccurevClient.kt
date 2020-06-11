@@ -28,6 +28,7 @@ import jenkins.plugins.accurevclient.model.AccurevTransactions
 import jenkins.plugins.accurevclient.model.AccurevInfo
 import jenkins.plugins.accurevclient.model.AccurevUpdate
 import jenkins.plugins.accurevclient.model.AccurevFiles
+import jenkins.plugins.accurevclient.model.AccurevStreamType
 
 interface AccurevClient {
 
@@ -78,6 +79,10 @@ interface AccurevClient {
     fun fetchDepot(depot: String): AccurevDepot?
 
     fun fetchStream(depot: String, stream: String): AccurevStream?
+
+    fun fetchStreams(depot: String, types: Collection<AccurevStreamType>): Collection<AccurevStream>
+
+    fun fetchChildStreams(depot: String, stream: String, types: Collection<AccurevStreamType>): Collection<AccurevStream>
 
     fun fetchTransaction(stream: String): AccurevTransaction
 

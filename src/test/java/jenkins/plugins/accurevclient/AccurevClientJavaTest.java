@@ -12,6 +12,7 @@ import jenkins.plugins.accurevclient.model.AccurevStreams;
 import jenkins.plugins.accurevclient.model.AccurevTransaction;
 import jenkins.plugins.accurevclient.model.AccurevWorkspace;
 import jenkins.plugins.accurevclient.model.AccurevWorkspaces;
+import jenkins.plugins.accurevclient.model.AccurevStreamType;
 import kotlin.jvm.JvmField;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.Matchers;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Arrays;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -97,7 +99,6 @@ public class AccurevClientJavaTest {
     }
 
 
-
     @Test public void fetchLatestTransaction() throws Exception {
         String depotName = mkDepot(client);
         String streamName = mkStream(depotName, client);
@@ -136,7 +137,24 @@ public class AccurevClientJavaTest {
         assertEquals(streamName, generatedStream.getName());
     }
 
+    @Test public void fetchStreams() throws Exception {
+        /**
+         *  depotName
+         *      - stream
+         *      - gatedstream
+         *          - stagingStream
+         *            - workspace
+         */
+        String depotName = mkDepot(client);
+        String streamName = mkStream(depotName,client);
+        String gatedStreamName = mkStream(depotName, client,true);
+        String workspace = mkWorkspace(gatedStreamName, client);
+        assertEquals(5, client.getStreams(depotName).getList().size());
+        assertEquals(2, client.fetchStreams(depotName, Arrays.asList(AccurevStreamType.Normal)).size());
+        assertEquals(1, client.fetchStreams(depotName, Arrays.asList(AccurevStreamType.Workspace)).size());
+        assertEquals(4, client.fetchStreams(depotName, Arrays.asList(AccurevStreamType.Normal, AccurevStreamType.Gated, AccurevStreamType.Staging)).size());
 
+    }
 
     @Test public void getUpdatedParents() throws Exception {
         String depotName = mkDepot(client);
@@ -389,11 +407,19 @@ public class AccurevClientJavaTest {
         return stream;
     }
 
+    private String mkStream(String depot, AccurevClient client, boolean isGated) throws Exception {
+        String stream = generateString(10);
+        String execute = client.stream().create(stream, depot, isGated).execute();
+        assertTrue(execute.contains(stream));
+        return stream;
+    }
+
     private String mkWorkspace(String stream, AccurevClient client) throws Exception {
         String workspace = generateString(10);
         client.workspace().create(workspace, stream).execute();
         return workspace;
     }
+
 
     private String generateString(int count){
         String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

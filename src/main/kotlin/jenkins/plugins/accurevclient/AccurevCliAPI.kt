@@ -429,6 +429,16 @@ class AccurevCliAPI(
         return depots.map[depot]
     }
 
+    override fun fetchStreams(depot: String, types: Collection<AccurevStreamType>): Collection<AccurevStream> {
+        val streams = getStreams(depot)
+        return streams.list.filter { s -> types?.contains(s.type)!! }
+    }
+
+    override fun fetchChildStreams(depot: String, stream: String, types: Collection<AccurevStreamType>): Collection<AccurevStream> {
+        val streams = getChildStreams(depot, stream)
+        return streams.list.filter { s -> types?.contains(s.type)!! }
+    }
+
     override fun fetchStream(depot: String, stream: String): AccurevStream? {
         val streams = getStreams(depot)
         return streams.map[stream]
