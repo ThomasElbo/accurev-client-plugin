@@ -564,15 +564,19 @@ class AccurevCliAPI(
         }
     }
 
-    override fun getUpdatesFromAncestors( depot: String, stream: String, timeSpec: Long ): MutableList<AccurevTransaction> {
+    override fun getUpdatesFromAncestors( depot: String, stream: String, timeSpecLower: Long): MutableList<AccurevTransaction> {
+        return getUpdatesFromAncestors(depot, stream, timeSpecLower, "now")
+    }
+
+    override fun getUpdatesFromAncestors( depot: String, stream: String, timeSpecLower: Long, timeSpecUpper: String ): MutableList<AccurevTransaction> {
         var s = this.fetchStream(depot, stream)
-        var ts = timeSpec
+        var tsl = timeSpecLower
         var updates: MutableCollection<AccurevTransaction> = mutableListOf()
         while ( s != null ) {
-            var listOfTransactions = fetchStreamTransactionHistory(s.name, (timeSpec + 1).toString())
+            var listOfTransactions = fetchStreamTransactionHistory(s.name, (tsl + 1).toString(), timeSpecUpper)
 
             if (listOfTransactions.transactions.isNotEmpty()) {
-                listOfTransactions.transactions.forEach { at -> if (at.id > ts) updates.add(at) }
+                listOfTransactions.transactions.forEach { at -> if (at.id > tsl) updates.add(at) }
             }
 
             if (s.type == (AccurevStreamType.Snapshot) || ((s.time != null) && (s.time!!.before( Date(System.currentTimeMillis()))))) {
