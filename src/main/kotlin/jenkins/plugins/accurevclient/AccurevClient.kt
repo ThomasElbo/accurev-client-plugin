@@ -96,7 +96,7 @@ interface AccurevClient {
 
     fun getChildStreams(depot: String, stream: String): AccurevStreams
 
-    fun fetchStreamTransactionHistory(stream: String, timeSpecLower: String, timeSpecUpper: String = "now"): AccurevTransactions
+    fun fetchStreamTransactionHistory(stream: String, timeSpecLower: String, timeSpecUpper: String = "now", types: Collection<String> = emptyList(), excludeKinds: Boolean = false): AccurevTransactions
 
     fun getUpdatesFromAncestors( depot: String, stream: String, timeSpecLower: Long): MutableCollection<AccurevTransaction>
 

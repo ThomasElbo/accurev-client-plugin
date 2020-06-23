@@ -516,9 +516,14 @@ class AccurevCliAPI(
         return childStreams.distinct()
     }
 
-    override fun fetchStreamTransactionHistory(stream: String, timeSpecLower: String, timeSpecUpper: String): AccurevTransactions {
+    override fun fetchStreamTransactionHistory(stream: String, timeSpecLower: String, timeSpecUpper: String, types: Collection<String>, excludeKinds: Boolean): AccurevTransactions {
         with(accurev("hist", true)) {
-            val accurevTransactions = add("-t", "$timeSpecLower-$timeSpecUpper", "-s", stream).launch().unmarshal() as AccurevTransactions // Range
+            add("-t", "$timeSpecLower-$timeSpecUpper", "-s", stream)
+            types.forEach {
+                add("-k", it)
+            }
+            if(excludeKinds) add("--exclude_kinds")
+            val accurevTransactions = launch().unmarshal() as AccurevTransactions // Range
             accurevTransactions.transactions.forEach { transaction -> transaction.stream = stream }
             return accurevTransactions
         }
@@ -569,11 +574,13 @@ class AccurevCliAPI(
     }
 
     override fun getUpdatesFromAncestors( depot: String, stream: String, timeSpecLower: Long, timeSpecUpper: String ): MutableList<AccurevTransaction> {
-        var s = this.fetchStream(depot, stream)
+        val streams = getStreams(depot)
+        var s = streams.map[stream]
+        //var s = this.fetchStream(depot, stream)
         var tsl = timeSpecLower
         var updates: MutableCollection<AccurevTransaction> = mutableListOf()
         while ( s != null ) {
-            var listOfTransactions = fetchStreamTransactionHistory(s.name, (tsl + 1).toString(), timeSpecUpper)
+            var listOfTransactions = fetchStreamTransactionHistory(s.name, (tsl + 1).toString(), timeSpecUpper, listOf("dispatch"), excludeKinds = true)
 
             if (listOfTransactions.transactions.isNotEmpty()) {
                 listOfTransactions.transactions.forEach { at -> if (at.id > tsl) updates.add(at) }
@@ -582,7 +589,8 @@ class AccurevCliAPI(
             if (s.type == (AccurevStreamType.Snapshot) || ((s.time != null) && (s.time!!.before( Date(System.currentTimeMillis()))))) {
                 break
             }
-            s = this.fetchStream(depot, s.parent?.name ?: "")
+            //s = this.fetchStream(depot, s.parent?.name ?: "")
+            s = streams.map[s.parent?.name ?: ""]
         }
 
         return updates.toMutableList()
